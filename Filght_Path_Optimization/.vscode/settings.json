@@ -5,6 +5,14 @@
         "algorithm": "cpp",
         "bitset": "cpp",
         "chrono": "cpp",
-        "unordered_map": "cpp"
+        "unordered_map": "cpp",
+        "queue": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "istream": "cpp",
+        "typeinfo": "cpp",
+        "iosfwd": "cpp",
+        "string": "cpp",
+        "iostream": "cpp"
     }
 }

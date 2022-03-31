@@ -8,12 +8,8 @@ using namespace Que;
 // Un-driected, Weighted graph
 
 struct Node{
-    vector<int,int> location; // 공항 위치 (경도, 위도)
-    string name; // 공항 이름
-    string type; // 공항 타입 
-    int id; // 공항 번호 
-    float weight; // edge weight
-    struct Node *next;
+    int airport_id;
+    float weight;
 };
 
 class AdjList{
@@ -25,26 +21,38 @@ class AdjList{
         Queue queue; // 최단 경로 저장 
 
     public:
-        AdjList(){}
+        AdjList(){
+            V = 0;
+            E = 0;
+        }
         ~AdjList(){}
         
-        void AdjListSetting(Node* airportList, int count){ 
+        void AdjListSetting(int vertexNum){ 
             // adjList에 공항 수만큼 할당(node 수 만큼)
                 // V 갱신 
+                V = vertexNum;
                 // 공항 수 만큼 adjList 생성  
-                adjList = new vector<Node>[count+1];
-                // adjList의 각 백터 첫번째 node에 공항 정보 추가 
-
-                    // for (int i=0;i<count;i++) adjList[i]
-                // visited = new bool[count+1];
-                // visited false로 초기화 
+                adjList = new vector<Node>[V+1];
+                // visited array setting
+                visited = new bool[V+1];
+                for(int i=0;i<V+1;i++) visited[i] = false;
         }
 
-        void AddEdge(string airport_a, string airport_b, float weight){    
-            // 공항간 path 추가 (Undirected 이기 때문에 두번해줘야함)
-                // add edge a > b
-                // add edge b < a
+        void AddEdge(int start, int end, float weight){    
+            Node newEdge;
+            newEdge.airport_id = end;
+            newEdge.weight = weight;
+            adjList[start].push_back(newEdge); 
+        }
 
+        void ShowList(){
+            cout<<"<Edge List>"<<endl;
+            for(int i=1;i<=V;i++){             
+                for(int j=0;j<adjList[i].size();j++){
+                    cout << "["<<i<<","<<adjList[i].at(j).airport_id<<"]: "<<adjList[i].at(j).weight<<endl;
+                }
+                cout << endl;
+            }
         }
 
 };
