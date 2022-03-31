@@ -9,7 +9,7 @@ using namespace Que;
 
 struct Node{
     int airport_id;
-    float weight;
+    double weight;
 };
 
 class AdjList{
@@ -54,5 +54,4 @@ class AdjList{
                 cout << endl;
             }
         }
-
 };

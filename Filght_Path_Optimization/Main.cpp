@@ -5,6 +5,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <cmath>
 #include "AdjacencyList.h"
 using namespace std;
 
@@ -16,11 +17,11 @@ struct Airport{ // airport info
     string type;
     string IATA;
     string ICAO;
-    vector<float> location;
+    vector<double> location;
 };
 
 struct Section{ // danger section info
-    vector<float> point_one;
+    vector<double> point_one;
 };
 
 int ShowMenu();
@@ -29,6 +30,7 @@ int FindAirport_NametoId(string name, Airport* airportList, int airportCnt);
 int FindAirport_IdtoName(int id, Airport* airportList, int airportCnt);
 void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt);
 void ShowAirportList(Airport* airportList, int airportCnt);
+double CalcWeight(vector<double> start, vector<double> end);
 
 int main(){
     int menu;
@@ -66,14 +68,12 @@ int main(){
     return 0;
 }
 
-
 int ShowMenu(){
     int menu;
     cout << "\n1. Shortest path: with out weather\n2. Shortest path: with weather\n3.Print Graph\n4.Quit\n"; 
     cin >> menu;
     return menu;
 }
-
 
 int ReadData(string filename, Airport*& airportList)
 {
@@ -111,52 +111,12 @@ int ReadData(string filename, Airport*& airportList)
     fs.close();
     return file_lines;
 }
-/*
-Airport* ReadData(string filename, int* airportCnt)
-{
-    int file_lines = 0;
-    fstream fs; 
-    vector<string> lines;
-    string line;
 
-    fs.open(filename, ios::in);
-    if(!fs.is_open()) cout << "Not found"<<endl;
-    
-    // Read csv by line
-    getline(fs, line); 
-    while(getline(fs, line)){
-        lines.push_back(line); // cut by '\n'
-        file_lines++;
-    }
-    airportCnt = file_lines;
-    cout << "index: "<< file_lines<< endl;
-
-    // Create and setting node list
-    Airport* airportList; // make Node list, 0은 사용하지 x
-    airportList = new Airport[file_lines+1];
-    for(int i=1;i<=file_lines;i++){ // cut by ',' and make Node
-        istringstream ss(lines[i-1]);
-        airportList[i].id = i;
-        getline(ss, airportList[i].name, ','); 
-        getline(ss, airportList[i].type, ',');
-        getline(ss, airportList[i].IATA, ',');
-        getline(ss, airportList[i].ICAO, ',');
-        getline(ss, line, ',');
-        airportList[i].location.push_back(stof(line));
-        getline(ss, line, ',');
-        airportList[i].location.push_back(stof(line));
-    }
-    
-    cout << endl;
-    fs.close();
-    return airportList;
-} 
-*/
 void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt){
     int edgeCnt;
     string start_name, end_name;
     int start_id, end_id;
-    float weight = 0;
+    double weight = 0;
 
     // Get Input 
     cout << "How many edges: ";
@@ -169,15 +129,28 @@ void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt){
         end_id = FindAirport_NametoId(end_name, airportList, airportCnt);
         
         // Calc edge weight
-
+        weight = CalcWeight(airportList[start_id].location,airportList[end_id].location);
         // Add edge in graph
         adjList->AddEdge(start_id, end_id, weight);// a>b
         adjList->AddEdge(end_id, start_id, weight);// b<a
     }
 }
 
-float CalcWeight(){
-    float weight;
+double CalcWeight(vector<double> start, vector<double> end){
+    double weight;
+    // Haversine Formula
+    double radius = 6371; // earth radius (km)
+    double toRadian = M_PI / 180;
+
+    double deltaLatitude = abs(start[0] - end[0]);
+    double deltaLongitude = abs(start[1] - end[1]) * toRadian;
+
+    double sinDeltaLat = sin(deltaLatitude / 2);
+    double sinDeltaLng = sin(deltaLongitude / 2);
+    double squareRoot = sqrt( sinDeltaLat * sinDeltaLat + cos(start[0] * toRadian) * cos(end[0] * toRadian) * sinDeltaLng * sinDeltaLng);
+
+    weight = 2 * radius * asin(squareRoot);
+
     return weight;
 }
 
