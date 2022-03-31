@@ -21,7 +21,7 @@ struct Airport{ // airport info
 };
 
 struct Section{ // danger section info
-    vector<double> point_one;
+    vector<double> points;
 };
 
 int ShowMenu();
@@ -29,14 +29,18 @@ int ReadData(string filename, Airport*& airportList);
 int FindAirport_NametoId(string name, Airport* airportList, int airportCnt);
 int FindAirport_IdtoName(int id, Airport* airportList, int airportCnt);
 void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt);
-void ShowAirportList(Airport* airportList, int airportCnt);
+int GetSection(Section*& sectionList);
 double CalcWeight(vector<double> start, vector<double> end);
+void ShowAirportList(Airport* airportList, int airportCnt);
+void ShowSectionList(Section* sectionList, int sectionCnt);
 
 int main(){
     int menu;
     AdjList adjList;
-    int airportCnt; // 공항 cnt
-    Airport* airportList;
+    int airportCnt; // airport cnt
+    Airport* airportList; // airport list
+    int sectionCnt; // danger section cnt
+    Section* sectionList; // danger section list 
 
     // Get csv data  
     airportCnt = ReadData("South_Korea_airport_toy_example.csv",airportList);
@@ -50,14 +54,17 @@ int main(){
 
     // main
     while(1){
+        cin.ignore();
         menu = ShowMenu();
         if(menu == 1){
             // Dij
             // reseult print
         }else if(menu == 2){
             // get input of section
+            sectionCnt = GetSection(sectionList);
+            ShowSectionList(sectionList, sectionCnt);
             // edge check 
-            // Dij
+            // Dij 
             // reseult print
         }else if(menu == 3){
             adjList.ShowList();
@@ -65,6 +72,8 @@ int main(){
             break;
         }
     }
+    
+    delete[] airportList;
     return 0;
 }
 
@@ -112,7 +121,7 @@ int ReadData(string filename, Airport*& airportList)
     return file_lines;
 }
 
-void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt){
+void GetEdge(AdjList* adjList, Airport* airportList, int airportCnt){
     int edgeCnt;
     string start_name, end_name;
     int start_id, end_id;
@@ -130,10 +139,30 @@ void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt){
         
         // Calc edge weight
         weight = CalcWeight(airportList[start_id].location,airportList[end_id].location);
+        
         // Add edge in graph
         adjList->AddEdge(start_id, end_id, weight);// a>b
         adjList->AddEdge(end_id, start_id, weight);// b<a
     }
+}
+
+int GetSection(Section*& sectionList){
+    int sectionCnt;
+    double x, y;
+    cout << "How many danger section: ";
+    cin >> sectionCnt;
+    sectionList = new Section[sectionCnt];
+
+    for(int i=0;i<sectionCnt;i++){
+        // Get point
+        for(int j=0;j<4;j++){
+            cout << "point"<<i<<" (double double): ";   
+            scanf("%lf %lf",&x,&y);
+            sectionList[i].points.push_back(x);
+            sectionList[i].points.push_back(y);
+        }
+    }
+    return sectionCnt;
 }
 
 double CalcWeight(vector<double> start, vector<double> end){
@@ -174,4 +203,13 @@ int FindAirport_NametoId(string name, Airport* airportList, int airportCnt){
 
 void ShowAirportList(Airport* airportList, int airportCnt){
     for(int i=1;i<=airportCnt;i++) cout << airportList[i].id << " / "<< airportList[i].name << " / " << airportList[i].type << " / "<< airportList[i].IATA << " / "<< airportList[i].ICAO << " / "<< airportList[i].location[0] << " / "<< airportList[i].location[1] << endl;
+}
+
+void ShowSectionList(Section* sectionList, int sectionCnt){
+    for(int i=0;i<sectionCnt;i++){
+        for(int j=0;j<=6;j=j+2){
+            cout <<"(" << sectionList[i].points[j] << ","<< sectionList[i].points[j+1] <<")";
+        }
+        cout <<endl;
+    }
 }

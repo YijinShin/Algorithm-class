@@ -1,9 +1,8 @@
 #pragma once 
 #include <iostream>
 #include <vector>
-#include "Queue.h"
+#include <queue>
 using namespace std;
-using namespace Que;
 
 // Un-driected, Weighted graph
 
@@ -18,14 +17,17 @@ class AdjList{
         int V; // vertex num
         int E; // edge num
         bool *visited; // 탐색에서 사용
-        Queue queue; // 최단 경로 저장 
+        queue<int> que; // 최단 경로 저장 
 
     public:
         AdjList(){
             V = 0;
             E = 0;
         }
-        ~AdjList(){}
+        ~AdjList(){
+            delete[] visited;
+            delete[] adjList;
+        }
         
         void AdjListSetting(int vertexNum){ 
             // adjList에 공항 수만큼 할당(node 수 만큼)
@@ -54,4 +56,6 @@ class AdjList{
                 cout << endl;
             }
         }
+
+        
 };
