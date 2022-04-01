@@ -33,6 +33,7 @@ int GetSection(Section*& sectionList);
 double CalcWeight(vector<double> start, vector<double> end);
 void ShowAirportList(Airport* airportList, int airportCnt);
 void ShowSectionList(Section* sectionList, int sectionCnt);
+void ShowQueue(queue<int> que, Airport* airportList, int airportCnt);
 
 int main(){
     int menu;
@@ -41,6 +42,11 @@ int main(){
     Airport* airportList; // airport list
     int sectionCnt; // danger section cnt
     Section* sectionList; // danger section list 
+    
+    queue<int> shortestPath;
+    queue<int> shortestPath_weather;
+    string start_name,end_name;
+    int start_id, end_id;
 
     // Get csv data  
     airportCnt = ReadData("South_Korea_airport_toy_example.csv",airportList);
@@ -52,23 +58,38 @@ int main(){
     // Get edge 
     GetEdge(&adjList, airportList, airportCnt);
 
+    // Get start, end point
+
     // main
     while(1){
         cin.ignore();
         menu = ShowMenu();
         if(menu == 1){
-            // Dij
-            // reseult print
-        }else if(menu == 2){
+            // get start, end point
+            cout <<  "Start point: ";
+            cin >> start_name;
+            cout <<  "End point: ";
+            cin >> end_name;
+            start_id = FindAirport_NametoId(start_name, airportList, airportCnt);
+            end_id = FindAirport_NametoId(end_name, airportList, airportCnt);
             // get input of section
             sectionCnt = GetSection(sectionList);
             ShowSectionList(sectionList, sectionCnt);
-            // edge check 
-            // Dij 
-            // reseult print
-        }else if(menu == 3){
+            // Dij: without weather
+            shortestPath =  adjList.Dijkstra(start_id, end_id);
+            // print result
+            cout << "Shortest path (not consider weather): ";
+            ShowQueue(shortestPath, airportList, airportCnt);
+            // edge checking
+            
+            // Dij: with weather
+            shortestPath_weather =  adjList.Dijkstra(start_id, end_id);
+            // print result
+            cout << "Shortest path (consider weather): ";
+            ShowQueue(shortestPath_weather, airportList, airportCnt);
+        }else if(menu == 2){
             adjList.ShowList();
-        }else if(menu == 4){
+        }else if(menu == 3){
             break;
         }
     }
@@ -77,9 +98,10 @@ int main(){
     return 0;
 }
 
+
 int ShowMenu(){
     int menu;
-    cout << "\n1. Shortest path: with out weather\n2. Shortest path: with weather\n3.Print Graph\n4.Quit\n"; 
+    cout << "\n1.Shortest path\n2.Print Graph\n3.Quit\n"; 
     cin >> menu;
     return menu;
 }
@@ -212,4 +234,16 @@ void ShowSectionList(Section* sectionList, int sectionCnt){
         }
         cout <<endl;
     }
+}
+
+void ShowQueue(queue<int> que, Airport* airportList, int airportCnt){
+    int id;
+    string name;
+    while(!que.empty()){
+        id = que.front();
+        que.pop();
+        name = FindAirport_IdtoName(id, airportList, airportCnt);
+        cout << name << " - ";
+    }
+    cout << endl;
 }
