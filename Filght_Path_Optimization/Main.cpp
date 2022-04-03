@@ -7,9 +7,10 @@
 #include <sstream>
 #include <cmath>
 #include "AdjacencyList.h"
+
 using namespace std;
 
-#define BUFSIZE 128
+#define M_PI 3.14159265358979323846
 
 struct Airport{ // airport info 
     int id;
@@ -27,12 +28,16 @@ struct Section{ // danger section info
 int ShowMenu();
 int ReadData(string filename, Airport*& airportList);
 int FindAirport_NametoId(string name, Airport* airportList, int airportCnt);
-int FindAirport_IdtoName(int id, Airport* airportList, int airportCnt);
+string FindAirport_IdtoName(int id, Airport* airportList, int airportCnt);
 void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt);
 int GetSection(Section*& sectionList);
+int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c);
+bool isIntersect(Section* sectionList, int sectionCnt);
+void Intersect_weight(AdjList* adjList);
 double CalcWeight(vector<double> start, vector<double> end);
 void ShowAirportList(Airport* airportList, int airportCnt);
 void ShowSectionList(Section* sectionList, int sectionCnt);
+void Save_csv(queue<int> que, Airport* airportList, int airportCnt, bool weather);
 void ShowQueue(queue<int> que, Airport* airportList, int airportCnt);
 
 int main(){
@@ -72,21 +77,26 @@ int main(){
             cin >> end_name;
             start_id = FindAirport_NametoId(start_name, airportList, airportCnt);
             end_id = FindAirport_NametoId(end_name, airportList, airportCnt);
+            cout << "start_id: " << start_id << " " << "end_id: " << end_id << "\n";
             // get input of section
             sectionCnt = GetSection(sectionList);
             ShowSectionList(sectionList, sectionCnt);
-            // Dij: without weather
-            shortestPath =  adjList.Dijkstra(start_id, end_id);
+            // 1. Dijkstra: without weather
+            vector<int>* from_without_weather = adjList.Dijkstra(start_id, end_id);
             // print result
             cout << "Shortest path (not consider weather): ";
+            shortestPath=adjList.path_queue(start_id, end_id, from_without_weather, shortestPath);
+            Save_csv(shortestPath, airportList, airportCnt, 0);
             ShowQueue(shortestPath, airportList, airportCnt);
-            // edge checking
             
-            // Dij: with weather
-            shortestPath_weather =  adjList.Dijkstra(start_id, end_id);
+            // 2. Dijkstra: with weather
+            vector<int>* from_with_weather = adjList.Dijkstra(start_id, end_id);
+            //shortestPath_weather =  adjList.Dijkstra(start_id, end_id);
             // print result
             cout << "Shortest path (consider weather): ";
-            ShowQueue(shortestPath_weather, airportList, airportCnt);
+            //shortestPath_weather = adjList.path_queue(start_id, end_id, from_with_weather, shortestPath_weather);
+            //Save_csv(shortestPath, airportList, airportCnt, 1);
+            //ShowQueue(shortestPath_weather, airportList, airportCnt);
         }else if(menu == 2){
             adjList.ShowList();
         }else if(menu == 3){
@@ -154,7 +164,7 @@ void GetEdge(AdjList* adjList, Airport* airportList, int airportCnt){
     cin >> edgeCnt;
     for(int i=0;i<edgeCnt;i++){
         // Get strat, end point
-        cout << "Edge(start,end): ";
+        cout << i+1 << "th "<<"Edge(start, end): ";
         cin >> start_name >> end_name;
         start_id = FindAirport_NametoId(start_name, airportList, airportCnt);
         end_id = FindAirport_NametoId(end_name, airportList, airportCnt);
@@ -163,8 +173,8 @@ void GetEdge(AdjList* adjList, Airport* airportList, int airportCnt){
         weight = CalcWeight(airportList[start_id].location,airportList[end_id].location);
         
         // Add edge in graph
-        adjList->AddEdge(start_id, end_id, weight);// a>b
-        adjList->AddEdge(end_id, start_id, weight);// b<a
+        adjList->AddEdge(start_id, end_id, weight);// a->b
+        adjList->AddEdge(end_id, start_id, weight);// b<-a
     }
 }
 
@@ -178,7 +188,7 @@ int GetSection(Section*& sectionList){
     for(int i=0;i<sectionCnt;i++){
         // Get point
         for(int j=0;j<4;j++){
-            cout << "point"<<i<<" (double double): ";   
+            cout << "point"<<j<<" (double double): ";
             scanf("%lf %lf",&x,&y);
             sectionList[i].points.push_back(x);
             sectionList[i].points.push_back(y);
@@ -187,13 +197,50 @@ int GetSection(Section*& sectionList){
     return sectionCnt;
 }
 
+int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
+    int op = a.first*b.second + b.first*c.second + c.first*a.second;
+    op -= (a.second*b.first + b.second*c.first + c.second*a.first);
+    if (op > 0)return 1;
+    else if (op == 0)return 0;
+    else return -1;
+}
+
+bool isIntersect(Section* sectionList, int sectionCnt){
+    for(int i=0;i<sectionCnt;i++){
+        //vertices between edges
+
+        // bad weather section
+        pair<int, int> a = {sectionList[i].points[0], sectionList[i].points[1]};
+        pair<int, int> b = {sectionList[i].points[2], sectionList[i].points[3]};
+        pair<int, int> c = {sectionList[i].points[4], sectionList[i].points[5]};
+        pair<int, int> d = {sectionList[i].points[6], sectionList[i].points[7]};
+        // ab, bc, cb, da
+
+
+        int ab = ccw(a, b, c)*ccw(a, b, d);
+        int cd = ccw(c, d, a)*ccw(c, d, b);
+        if (ab == 0 && cd == 0){
+            if (a > b)swap(a, b);
+            if (c > d)swap(c, d);
+            return (c <= b&&a <= d);
+        }
+        return (ab <= 0 && cd <= 0);
+    }
+}
+
+void Intersect_weight(AdjList* adjList){
+    //교차한 vertex에 큰 weight 부하
+    
+}
+
+
 double CalcWeight(vector<double> start, vector<double> end){
     double weight;
     // Haversine Formula
-    double radius = 6371; // earth radius (km)
+    double radius = 6371; // earth radius (km)  
     double toRadian = M_PI / 180;
 
-    double deltaLatitude = abs(start[0] - end[0]);
+    double deltaLatitude = abs(start[0] - end[0]) * toRadian;
     double deltaLongitude = abs(start[1] - end[1]) * toRadian;
 
     double sinDeltaLat = sin(deltaLatitude / 2);
@@ -205,13 +252,13 @@ double CalcWeight(vector<double> start, vector<double> end){
     return weight;
 }
 
-int FindAirport_IdtoName(int id, Airport* airportList, int airportCnt){
+string FindAirport_IdtoName(int id, Airport* airportList, int airportCnt){
     for(int i=1;i<=airportCnt;i++){
         if(airportList[i].id == id){
-            return i;
+            return airportList[i].name;
         }
     }
-    return -1;
+    return "not_found";
 }
 
 int FindAirport_NametoId(string name, Airport* airportList, int airportCnt){
@@ -228,12 +275,33 @@ void ShowAirportList(Airport* airportList, int airportCnt){
 }
 
 void ShowSectionList(Section* sectionList, int sectionCnt){
+    cout << "\nbad weather section\n";
     for(int i=0;i<sectionCnt;i++){
+        cout << i+1 << "th section: ";
         for(int j=0;j<=6;j=j+2){
             cout <<"(" << sectionList[i].points[j] << ","<< sectionList[i].points[j+1] <<")";
         }
         cout <<endl;
     }
+    cout << "\n";
+}
+
+void Save_csv(queue<int> que, Airport* airportList, int airportCnt, bool weather){
+    string f_name;
+    // if weather is 0, not consider weather
+    if(weather) f_name = "shortest_path_weather.csv";
+    else f_name = "shortest_path.csv";
+    ofstream outfile(f_name);
+    int qsize = que.size();
+    int id;
+    for(int i=0; i<qsize; i++){
+        id = que.front();
+        outfile << id;
+        if(i!=qsize-1) outfile << ",";
+        que.pop();
+        que.push(id);
+    }
+    outfile.close();
 }
 
 void ShowQueue(queue<int> que, Airport* airportList, int airportCnt){
@@ -243,7 +311,8 @@ void ShowQueue(queue<int> que, Airport* airportList, int airportCnt){
         id = que.front();
         que.pop();
         name = FindAirport_IdtoName(id, airportList, airportCnt);
-        cout << name << " - ";
+        if(que.size()!=0)cout << name << " -> ";
+        else cout << name;
     }
     cout << endl;
 }

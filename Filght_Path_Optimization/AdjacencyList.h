@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include <limits>
+#include <climits>
 using namespace std;
 
 // Un-driected, Weighted graph
@@ -19,7 +19,7 @@ struct Distance{
 
 struct cmp{
     bool operator()(Distance a, Distance b){
-        if(a.distance >= b.distance){
+        if(a.distance > b.distance){
             return true;
         }else return false;
     }
@@ -61,11 +61,11 @@ class AdjList{
                 }
         }
 
-        void AddEdge(int start, int end, float weight){    
+        void AddEdge(int start, int end, float weight){
             Node newEdge;
             newEdge.airport_id = end;
             newEdge.weight = weight;
-            adjList[start].push_back(newEdge); 
+            adjList[start].push_back(newEdge);
         }
 
         void ShowList(){
@@ -78,24 +78,65 @@ class AdjList{
             }
         }
 
-        queue<int> Dijkstra(int start, int end){
-            queue<int> shortestPath;
+        vector<int>* Dijkstra(int start, int end){
+            vector<int>* from = new vector<int>(V+1);
             priority_queue<Distance, vector<Distance>, cmp> p_que;
-            queue<int> S;
         
-            for(int i=0;i<V+1;i++) distance[i].distance = numeric_limits<int>::infinity();
+            for(int i=1;i<V+1;i++){
+                distance[i].distance = INT_MAX;
+            }
+            //시작점
             distance[start].distance = 0;
-            
-            // put all V in p_que (weight가 기준)
-            for(int i=1;i<=V;i++){
+
+            // put all V in p_que (작은 distance를 우선순위)
+            for(int i=1;i<V+1;i++){
                 p_que.push(distance[i]);
             }
             cout <<  "p_que setting:" <<p_que.size()<<endl;
+            
             // while p_que is not empty
-                // pop front 
+            while(!p_que.empty()){
+                int curr_id= p_que.top().airport_id;
+                // pop front
+                p_que.pop();
+                // if already visited, then pass
+                if(visited[curr_id]) continue;
                 // check visited
-                // dist calc (if already visited, then pass)
+                visited[curr_id] =true;
                 // heapify
-            return shortestPath;
+                // curr_id의 인접리스트로 연결된 경로
+                for(auto n : adjList[curr_id]){
+                    int next=n.airport_id;
+                    double curr_weight = n.weight;
+                    //cout << "curr_id: " << curr_id << "next: " << n.airport_id << "curr_weight: " << curr_weight << "\n";
+                    if(distance[next].distance>distance[curr_id].distance+curr_weight){
+                        distance[next].distance = distance[curr_id].distance+curr_weight;
+                        p_que.push(distance[next]);
+                        (*from)[next] = curr_id; // can find out about the previous path of next.
+                    }
+                }
+            }
+            return from;
         }   
+
+        queue<int> trace_path(int start, int end, vector<int>* from, queue<int> shortestpath){
+            //if the start and the end are the same
+            if((*from)[end]==start){
+                return shortestpath;
+            }
+            //recursion for the path to the vertex before vertex 'end'
+            trace_path(start, (*from)[end], from, shortestpath);
+            shortestpath.push((*from)[end]);
+            return shortestpath;
+        }
+
+        queue<int> path_queue(int start, int end, vector<int>* from, queue<int> shortestpath){
+            // start
+            shortestpath.push(start);
+            // shortest path between start and end
+            shortestpath = trace_path(start, end, from, shortestpath);
+            // end
+            shortestpath.push(end);
+            return shortestpath;
+        }
 };
