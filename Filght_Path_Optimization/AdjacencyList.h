@@ -3,6 +3,7 @@
 #include <vector>
 #include <queue>
 #include <climits>
+#include <stack>
 using namespace std;
 
 // Un-driected, Weighted graph
@@ -34,6 +35,8 @@ class AdjList{
         //int* distance; // Dijkstar에서 사용 
         Distance* distance;
         queue<int> que; // 최단 경로 저장 
+        vector<int>* from;
+        stack<int> shortestPath;
 
     public:
         AdjList(){
@@ -59,6 +62,8 @@ class AdjList{
                 for(int i=1;i<=V;i++){
                     distance[i].airport_id = i;
                 }
+                // from array setting
+                from = new vector<int>(V+1);
         }
 
         void AddEdge(int start, int end, float weight){
@@ -79,7 +84,6 @@ class AdjList{
         }
 
         vector<int>* Dijkstra(int start, int end){
-            vector<int>* from = new vector<int>(V+1);
             priority_queue<Distance, vector<Distance>, cmp> p_que;
         
             for(int i=1;i<V+1;i++){
@@ -111,7 +115,7 @@ class AdjList{
                     //cout << "curr_id: " << curr_id << "next: " << n.airport_id << "curr_weight: " << curr_weight << "\n";
                     if(distance[next].distance>distance[curr_id].distance+curr_weight){
                         distance[next].distance = distance[curr_id].distance+curr_weight;
-                        //p_que.push(distance[next]); // why? 
+                        
                         (*from)[next] = curr_id; // can find out about the previous path of next.
                         cout << "form next("<<next<<"):"<<curr_id<<endl;
                     }
@@ -120,6 +124,28 @@ class AdjList{
             return from;
         }   
 
+        queue<int> path_queue(int start, int end){
+            queue<int> shortpath_queue;
+            //push {end, from[end-1] ... from[start+1], start}
+            shortestPath.push(end); // push end
+            trace_path(start, end); // push {from[end-1] ... from[start+1], start}
+            
+            //change stack to queue (for other function)
+            while(!shortestPath.empty()){
+                shortpath_queue.push(shortestPath.top());
+                shortestPath.pop();
+            }
+            return shortpath_queue;
+        }
+
+        void trace_path(int start, int curr_id){
+            if(curr_id != start){
+                shortestPath.push((*from)[curr_id]);
+                trace_path(start,(*from)[curr_id]);
+            }
+        }
+        
+        /*
         queue<int> trace_path(int start, int end, vector<int>* from, queue<int> shortestpath){
             //if the start and the end are the same
             if((*from)[end]==start){
@@ -130,8 +156,9 @@ class AdjList{
             shortestpath.push((*from)[end]);
             return shortestpath;
         }
-
-        queue<int> path_queue(int start, int end, vector<int>* from, queue<int> shortestpath){
+        
+        queue<int> path_queue(int start, int end, vector<int>* from){
+            queue<int> shortestpath;
             // start
             shortestpath.push(start);
             // shortest path between start and end
@@ -140,4 +167,5 @@ class AdjList{
             shortestpath.push(end);
             return shortestpath;
         }
+        */
 };

@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <cmath>
+#include <stack>
 #include "AdjacencyList.h"
 
 using namespace std;
@@ -85,7 +86,7 @@ int main(){
             vector<int>* from_without_weather = adjList.Dijkstra(start_id, end_id);
             // print result
             cout << "Shortest path (not consider weather): ";
-            shortestPath=adjList.path_queue(start_id, end_id, from_without_weather, shortestPath);
+            shortestPath=adjList.path_queue(start_id, end_id);
             Save_csv(shortestPath, airportList, airportCnt, 0);
             ShowQueue(shortestPath, airportList, airportCnt);
             
