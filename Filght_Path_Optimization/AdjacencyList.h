@@ -92,7 +92,7 @@ class AdjList{
             for(int i=1;i<V+1;i++){
                 p_que.push(distance[i]);
             }
-            cout <<  "p_que setting:" <<p_que.size()<<endl;
+            //cout <<  "p_que setting:" <<p_que.size()<<endl;
             
             // while p_que is not empty
             while(!p_que.empty()){
@@ -105,14 +105,15 @@ class AdjList{
                 visited[curr_id] =true;
                 // heapify
                 // curr_id의 인접리스트로 연결된 경로
-                for(auto n : adjList[curr_id]){
-                    int next=n.airport_id;
-                    double curr_weight = n.weight;
+                for(auto n : adjList[curr_id]){ // 인접리스트로 연결된 경로 하나 씩 빼서
+                    int next=n.airport_id; 
+                    double curr_weight = n.weight;  
                     //cout << "curr_id: " << curr_id << "next: " << n.airport_id << "curr_weight: " << curr_weight << "\n";
                     if(distance[next].distance>distance[curr_id].distance+curr_weight){
                         distance[next].distance = distance[curr_id].distance+curr_weight;
-                        p_que.push(distance[next]);
+                        //p_que.push(distance[next]); // why? 
                         (*from)[next] = curr_id; // can find out about the previous path of next.
+                        cout << "form next("<<next<<"):"<<curr_id<<endl;
                     }
                 }
             }

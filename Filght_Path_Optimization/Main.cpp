@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define M_PI 3.14159265358979323846
+// M_PI는 cmath 헤더 안에 미리 선언되어있습니다:)
 
 struct Airport{ // airport info 
     int id;
@@ -226,6 +226,7 @@ bool isIntersect(Section* sectionList, int sectionCnt){
         }
         return (ab <= 0 && cd <= 0);
     }
+    return false;
 }
 
 void Intersect_weight(AdjList* adjList){
