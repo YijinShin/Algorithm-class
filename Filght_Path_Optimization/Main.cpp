@@ -49,7 +49,7 @@ int main(){
     int sectionCnt; // danger section cnt
     Section* sectionList; // danger section list 
     
-    queue<int> shortestPath;
+    queue<int> shortestPath_without_weather;
     queue<int> shortestPath_weather;
     string start_name,end_name;
     int start_id, end_id;
@@ -82,22 +82,27 @@ int main(){
             // get input of section
             sectionCnt = GetSection(sectionList);
             ShowSectionList(sectionList, sectionCnt);
+            
             // 1. Dijkstra: without weather
-            vector<int>* from_without_weather = adjList.Dijkstra(start_id, end_id);
-            // print result
-            cout << "Shortest path (not consider weather): ";
-            shortestPath=adjList.path_queue(start_id, end_id);
-            Save_csv(shortestPath, airportList, airportCnt, 0);
-            ShowQueue(shortestPath, airportList, airportCnt);
+                //Dijkstra
+                adjList.Dijkstra(start_id, end_id);
+                // print result
+                cout << "Shortest path (not consider weather): ";
+                shortestPath_without_weather=adjList.path_queue(start_id, end_id);
+                //Save_csv(shortestPath_without_weather, airportList, airportCnt, 0);
+                ShowQueue(shortestPath_without_weather, airportList, airportCnt);
             
             // 2. Dijkstra: with weather
-            vector<int>* from_with_weather = adjList.Dijkstra(start_id, end_id);
-            //shortestPath_weather =  adjList.Dijkstra(start_id, end_id);
-            // print result
-            cout << "Shortest path (consider weather): ";
-            //shortestPath_weather = adjList.path_queue(start_id, end_id, from_with_weather, shortestPath_weather);
-            //Save_csv(shortestPath, airportList, airportCnt, 1);
-            //ShowQueue(shortestPath_weather, airportList, airportCnt);
+                // edge weight fix 
+                    // intersection 확인 > 있으면 해당 edge weight 수정 
+                // Dijkstra
+                adjList.Dijkstra(start_id, end_id);
+                // print result
+                cout << "Shortest path (consider weather): ";
+                shortestPath_weather = adjList.path_queue(start_id, end_id);
+                //Save_csv(shortestPath, airportList, airportCnt, 1);
+                ShowQueue(shortestPath_weather, airportList, airportCnt);
+        
         }else if(menu == 2){
             adjList.ShowList();
         }else if(menu == 3){
@@ -210,11 +215,13 @@ bool isIntersect(Section* sectionList, int sectionCnt){
     for(int i=0;i<sectionCnt;i++){
         //vertices between edges
 
-        // bad weather section
+        // get point location of bad weather section (사각형에만 한정되므로 수정함. )
         pair<int, int> a = {sectionList[i].points[0], sectionList[i].points[1]};
         pair<int, int> b = {sectionList[i].points[2], sectionList[i].points[3]};
         pair<int, int> c = {sectionList[i].points[4], sectionList[i].points[5]};
         pair<int, int> d = {sectionList[i].points[6], sectionList[i].points[7]};
+        for(int j=0;j<sectionList[i].points.size();j=j+2);
+        
         // ab, bc, cb, da
 
 
