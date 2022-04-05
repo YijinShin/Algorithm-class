@@ -30,16 +30,17 @@ int ShowMenu();
 int ReadData(string filename, Airport*& airportList);
 int FindAirport_NametoId(string name, Airport* airportList, int airportCnt);
 string FindAirport_IdtoName(int id, Airport* airportList, int airportCnt);
-void GetEdge(AdjList* adjList,Airport* airportList, int airportCnt);
+int GetEdge(AdjList* adjList, Airport* airportList, int airportCnt, pair<int,int>*& edgeList);
 int GetSection(Section*& sectionList);
-int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c);
-bool isIntersect(Section* sectionList, int sectionCnt);
-void Intersect_weight(AdjList* adjList);
 double CalcWeight(vector<double> start, vector<double> end);
 void ShowAirportList(Airport* airportList, int airportCnt);
 void ShowSectionList(Section* sectionList, int sectionCnt);
 void Save_csv(queue<int> que, Airport* airportList, int airportCnt, bool weather);
 void ShowQueue(queue<int> que, Airport* airportList, int airportCnt);
+
+int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c);
+void CheckEdgeAvailable(AdjList* adjList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt);
+bool isIntersect(pair<int, int> x, pair<int, int> y, pair<int, int> z, pair<int, int> r);
 
 int main(){
     int menu;
@@ -54,6 +55,10 @@ int main(){
     string start_name,end_name;
     int start_id, end_id;
 
+    pair<int,int>* edgeList; // for checking edge in section
+    int edgeCnt;
+
+
     // Get csv data  
     airportCnt = ReadData("South_Korea_airport_toy_example.csv",airportList);
     ShowAirportList(airportList,airportCnt);
@@ -62,7 +67,7 @@ int main(){
     adjList.AdjListSetting(airportCnt);
     
     // Get edge 
-    GetEdge(&adjList, airportList, airportCnt);
+    edgeCnt = GetEdge(&adjList, airportList, airportCnt, edgeList);
 
     // Get start, end point
 
@@ -85,6 +90,7 @@ int main(){
             
             // 1. Dijkstra: without weather
                 //Dijkstra
+                adjList.ShowList();
                 adjList.Dijkstra(start_id, end_id);
                 // print result
                 cout << "Shortest path (not consider weather): ";
@@ -94,7 +100,8 @@ int main(){
             
             // 2. Dijkstra: with weather
                 // edge weight fix 
-                    // intersection 확인 > 있으면 해당 edge weight 수정 
+                CheckEdgeAvailable(&adjList, sectionList, sectionCnt, edgeList, edgeCnt);
+                adjList.ShowList();
                 // Dijkstra
                 adjList.Dijkstra(start_id, end_id);
                 // print result
@@ -159,7 +166,7 @@ int ReadData(string filename, Airport*& airportList)
     return file_lines;
 }
 
-void GetEdge(AdjList* adjList, Airport* airportList, int airportCnt){
+int GetEdge(AdjList* adjList, Airport* airportList, int airportCnt, pair<int,int>*& edgeList){
     int edgeCnt;
     string start_name, end_name;
     int start_id, end_id;
@@ -168,12 +175,17 @@ void GetEdge(AdjList* adjList, Airport* airportList, int airportCnt){
     // Get Input 
     cout << "How many edges: ";
     cin >> edgeCnt;
+    
+    edgeList = new pair<int,int>[edgeCnt]; // edge list 동적할당 
+    
     for(int i=0;i<edgeCnt;i++){
         // Get strat, end point
         cout << i+1 << "th "<<"Edge(start, end): ";
         cin >> start_name >> end_name;
         start_id = FindAirport_NametoId(start_name, airportList, airportCnt);
         end_id = FindAirport_NametoId(end_name, airportList, airportCnt);
+
+        edgeList[i] = {start_id, end_id}; // save edge in edgalist
         
         // Calc edge weight
         weight = CalcWeight(airportList[start_id].location,airportList[end_id].location);
@@ -182,6 +194,7 @@ void GetEdge(AdjList* adjList, Airport* airportList, int airportCnt){
         adjList->AddEdge(start_id, end_id, weight);// a->b
         adjList->AddEdge(end_id, start_id, weight);// b<-a
     }
+    return edgeCnt;
 }
 
 int GetSection(Section*& sectionList){
@@ -194,7 +207,7 @@ int GetSection(Section*& sectionList){
     for(int i=0;i<sectionCnt;i++){
         // Get point
         for(int j=0;j<4;j++){
-            cout << "point"<<j<<" (double double): ";
+            cout << "point"<<j<<"_clockwise! (double double): ";
             scanf("%lf %lf",&x,&y);
             sectionList[i].points.push_back(x);
             sectionList[i].points.push_back(y);
@@ -212,25 +225,27 @@ int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
     else return -1;
 }
 
-bool CheckEdge(){
-    // for 0 ~ edge num
+bool isIntersect(pair<int, int> x, pair<int, int> y, pair<int, int> z, pair<int, int> r){
+    // check intersection between to line (x,y) (z,r)
+    int xy = ccw(x,y,z)*ccw(x,y,r);
+    int zr = ccw(z,r,x)*ccw(z,r,y);
+    if(xy && zr == 0){
+        // 평항한데 겹치는 경우 reutrn true;
+        // 평행하고 안겹치는 경우 return false;
+    }else if( xy<0 && zr<0 ) return true;
+    return false;
+}  
 
-        // for 0~3 (line )
-}
-
+/*
 bool isIntersect(Section* sectionList, int sectionCnt){
     for(int i=0;i<sectionCnt;i++){
         //vertices between edges
-
         // get point location of bad weather section (사각형에만 한정되므로 수정함. )
         pair<int, int> a = {sectionList[i].points[0], sectionList[i].points[1]};
         pair<int, int> b = {sectionList[i].points[2], sectionList[i].points[3]};
         pair<int, int> c = {sectionList[i].points[4], sectionList[i].points[5]};
         pair<int, int> d = {sectionList[i].points[6], sectionList[i].points[7]};
-        
         // ab, bc, cb, da
-
-
         int ab = ccw(a, b, c)*ccw(a, b, d);
         int cd = ccw(c, d, a)*ccw(c, d, b);
         if (ab == 0 && cd == 0){
@@ -241,12 +256,29 @@ bool isIntersect(Section* sectionList, int sectionCnt){
         return (ab <= 0 && cd <= 0);
     }
     return false;
-}
+}*/
+ 
+void CheckEdgeAvailable(AdjList* adjList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt){
+    pair<double, double> sec_points[4]; 
+    pair<double,double> x,y;
 
-
-void Intersect_weight(AdjList* adjList){
-    //교차한 vertex에 큰 weight 부하
-    
+    for(int i=0;i<edgeCnt;i++){ // for 1 ~ edge num
+        x = {};
+        y = {};
+        for(int j=0;j<sectionCnt;j++){ // for 1 ~ lines forming a polygon
+            // save section points
+            for(int k=0;k<4;k++){
+                sec_points[k] = {sectionList[j].points[2*k], sectionList[j].points[2*k+1]};
+            }
+            // check intersection 
+            for(int k=0;k<4;k++){
+                if(isIntersect(sec_points[k], sec_points[k+1], x,y )){
+                    // change weight
+                    (*adjList).ChangeWeight(edgeList[i].first,edgeList[i].second);
+                }
+            }
+        }
+    }
 }
 
 

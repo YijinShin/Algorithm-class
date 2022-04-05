@@ -26,10 +26,6 @@ struct cmp{
     }
 };
 
-struct Section{ // danger section info
-    vector<double> points;
-};
-
 class AdjList{
     private:
         vector<Node>* adjList;
@@ -41,6 +37,7 @@ class AdjList{
         queue<int> que; // 최단 경로 저장 
         vector<int>* from;
         stack<int> shortestPath;
+        
 
     public:
         AdjList(){
@@ -122,7 +119,6 @@ class AdjList{
                         distance[next].distance = distance[curr_id].distance+curr_weight;
                         
                         (*from)[next] = curr_id; // can find out about the previous path of next.
-                        cout << "form next("<<next<<"):"<<curr_id<<endl;
                     }
                 }
             }
@@ -148,65 +144,13 @@ class AdjList{
                 trace_path(start,(*from)[curr_id]);
             }
         }
-        
-        int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
-            double external = (b.first - a.first)*(c.second - a.second) - (b.second - a.second)*(c.first - a.first);
-            if (external > 0)return 1;
-            else if (external == 0)return 0;
-            else return -1;
-        }
 
-        bool isIntersect(pair<int, int> x, pair<int, int> y, pair<int, int> z, pair<int, int> r){
-            // check intersection between to line (x,y) (z,r)
-            int xy = ccw(x,y,z)*ccw(x,y,r);
-            int zr = ccw(z,r,x)*ccw(z,r,y);
-            if(xy && zr == 0){
-                // 평항한데 겹치는 경우 reutrn true;
-                // 평행하고 안겹치는 경우 return false;
-            }else if( xy<0 && zr<0 ) return true;
-            else return false;
-        }  
-
-        // We have to visit all edges
-        void CheckEdgeAvailable(Section* sectionList, int sectionCnt){
-            // for 1 ~ edge num
-            for(int i=0;i<E;i++){
-                
-                
-                // for 1 ~ lines forming a polygon
-                for(int j=0;j<sectionCnt;j++){
-                    // make lines 
-                    pair<int, int> a = {sectionList[j].points[0], sectionList[j].points[1]};
-                    pair<int, int> b = {sectionList[j].points[2], sectionList[j].points[3]};
-                    pair<int, int> c = {sectionList[j].points[4], sectionList[j].points[5]};
-                    pair<int, int> d = {sectionList[j].points[6], sectionList[j].points[7]};
-                    // check intersection 
-                    //if(isIntersect(a,b,)) cout << "Edge()can't use"<<endl; 
+        void ChangeWeight(int a, int b){
+            int i=0;
+            for(i=0;i<adjList[a].size();i++){
+                if(adjList[a].at(i).airport_id ==  b){ 
+                        adjList[a].at(i).weight = INT_MAX;
                 }
             }
         }
-
-        /*
-        queue<int> trace_path(int start, int end, vector<int>* from, queue<int> shortestpath){
-            //if the start and the end are the same
-            if((*from)[end]==start){
-                return shortestpath;
-            }
-            //recursion for the path to the vertex before vertex 'end'
-            trace_path(start, (*from)[end], from, shortestpath);
-            shortestpath.push((*from)[end]);
-            return shortestpath;
-        }
-        
-        queue<int> path_queue(int start, int end, vector<int>* from){
-            queue<int> shortestpath;
-            // start
-            shortestpath.push(start);
-            // shortest path between start and end
-            shortestpath = trace_path(start, end, from, shortestpath);
-            // end
-            shortestpath.push(end);
-            return shortestpath;
-        }
-        */
 };
