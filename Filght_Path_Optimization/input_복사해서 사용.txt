@@ -1,3 +1,6 @@
+
+[test case 1]
+
 9
 Incheon Jeju
 Incheon Cheongju
@@ -16,3 +19,23 @@ Pohang
 128.7 37.6
 129.3 37.6
 129.3 36.6
+
+
+
+-----
+[test case 2]
+6
+Incheon Cheongju
+Cheongju Yangyang
+Yangyang Pohang
+Incheon Jeju
+Jeju Gimhae
+Gimhae Pohang
+1
+Incheon
+Pohang
+1
+128.7 37.6
+129.3 37.6
+129.3 36.6
+128.7 36.6
