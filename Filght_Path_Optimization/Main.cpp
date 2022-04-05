@@ -272,7 +272,14 @@ void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* section
             }
             // check intersection 
             for(int k=0;k<4;k++){
-                if(isIntersect(sec_points[k], sec_points[k+1], x,y )){
+                if(k==3){
+                    if(isIntersect(sec_points[k], sec_points[0], x,y )){
+                        // change weight
+                        (*adjList).ChangeWeight(edgeList[i].first,edgeList[i].second);
+                    }
+
+                }
+                else if(isIntersect(sec_points[k], sec_points[k+1], x,y )){
                     // change weight
                     (*adjList).ChangeWeight(edgeList[i].first,edgeList[i].second);
                 }
