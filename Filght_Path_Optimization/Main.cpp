@@ -69,8 +69,6 @@ int main(){
     // Get edge 
     edgeCnt = GetEdge(&adjList, airportList, airportCnt, edgeList);
 
-    // Get start, end point
-
     // main
     while(1){
         cin.ignore();
@@ -95,9 +93,9 @@ int main(){
                 // print result
                 cout << "Shortest path (not consider weather): ";
                 shortestPath_without_weather=adjList.path_queue(start_id, end_id);
-                //Save_csv(shortestPath_without_weather, airportList, airportCnt, 0);
+                Save_csv(shortestPath_without_weather, airportList, airportCnt, 0);
                 ShowQueue(shortestPath_without_weather, airportList, airportCnt);
-            
+
             // 2. Dijkstra: with weather
                 // edge weight fix 
                 CheckEdgeAvailable(&adjList, airportList,sectionList, sectionCnt, edgeList, edgeCnt);
@@ -107,7 +105,7 @@ int main(){
                 // print result
                 cout << "Shortest path (consider weather): ";
                 shortestPath_weather = adjList.path_queue(start_id, end_id);
-                //Save_csv(shortestPath, airportList, airportCnt, 1);
+                Save_csv(shortestPath_weather, airportList, airportCnt, 1);
                 ShowQueue(shortestPath_weather, airportList, airportCnt);
         
         }else if(menu == 2){
@@ -225,46 +223,41 @@ int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
     else return -1;
 }
 
-bool isIntersect(pair<int, int> x, pair<int, int> y, pair<int, int> z, pair<int, int> r){
-    // check intersection between to line (x,y) (z,r)
-    int xy = ccw(x,y,z)*ccw(x,y,r);
-    int zr = ccw(z,r,x)*ccw(z,r,y);
-    if(xy && zr == 0){
-        // 평항한데 겹치는 경우 reutrn true;
-        // 평행하고 안겹치는 경우 return false;
-    }else if( xy<0 && zr<0 ) return true;
-    return false;
-}  
+bool isIntersect(pair<int, int> a, pair<int, int> b, pair<int, int> c, pair<int, int> d){
+    // check intersection between to line (a,b) (c,d)
+    int ab = ccw(a,b,c)*ccw(a,b,d);
+    int cd = ccw(c,d,a)*ccw(c,d,b);
 
-/*
-bool isIntersect(Section* sectionList, int sectionCnt){
-    for(int i=0;i<sectionCnt;i++){
-        //vertices between edges
-        // get point location of bad weather section (사각형에만 한정되므로 수정함. )
-        pair<int, int> a = {sectionList[i].points[0], sectionList[i].points[1]};
-        pair<int, int> b = {sectionList[i].points[2], sectionList[i].points[3]};
-        pair<int, int> c = {sectionList[i].points[4], sectionList[i].points[5]};
-        pair<int, int> d = {sectionList[i].points[6], sectionList[i].points[7]};
-        // ab, bc, cb, da
-        int ab = ccw(a, b, c)*ccw(a, b, d);
-        int cd = ccw(c, d, a)*ccw(c, d, b);
-        if (ab == 0 && cd == 0){
-            if (a > b)swap(a, b);
-            if (c > d)swap(c, d);
-            return (c <= b&&a <= d);
+    // 평행하면 ab, cd 둘다 0이다.
+    if(ab == 0 && cd == 0){
+        // 평행한데 겹치는 경우 true, 안겹치면 false;
+        // x축 평행인지, y축평행인지 판별
+        if(a.first == c.first){
+            //y축 방향으로 평행
+            if (a.second > b.second)swap(a.second, b.second);
+            if (c.second > d.second)swap(c.second, d.second);
+            return (c.second <= b.second && a.second <= d.second);
         }
-        return (ab <= 0 && cd <= 0);
+        else if(a.second == c.second){
+            //x축 방향으로 평행
+            if (a.first > b.first)swap(a.first, b.first);
+            if (c.first > d.first)swap(c.first, d.first);
+            return (c.first <= b.first && a.first <= d.first);
+        }
+        
     }
-    return false;
-}*/
+    //평행하지 않지만 겹치는 경우 true;
+    //평행하지 않지만 안겹치는 경우 false;
+    return ( ab<=0 && cd<=0);
+}  
  
 void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt){
     pair<double, double> sec_points[4]; 
     pair<double,double> x,y;
 
     for(int i=0;i<edgeCnt;i++){ // for 1 ~ edge num
-        x = {airportList[edgeList[i].first].location.at(0), airportList[edgeList[i].first].location.at(1)};
-        y = {airportList[edgeList[i].second].location.at(0), airportList[edgeList[i].second].location.at(1)};
+        x = {airportList[edgeList[i].first].location.at(0), airportList[edgeList[i].first].location.at(1)}; //each x of two edges
+        y = {airportList[edgeList[i].second].location.at(0), airportList[edgeList[i].second].location.at(1)}; //each y of two edges
         for(int j=0;j<sectionCnt;j++){ // for 1 ~ lines forming a polygon
             // save section points
             for(int k=0;k<4;k++){
@@ -274,14 +267,20 @@ void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* section
             for(int k=0;k<4;k++){
                 if(k==3){
                     if(isIntersect(sec_points[k], sec_points[0], x,y )){
+                        cout << "The edge between " << airportList[edgeList[i].first].name 
+                        << " and "<< airportList[edgeList[i].second].name <<" is not available.\n";
                         // change weight
                         (*adjList).ChangeWeight(edgeList[i].first,edgeList[i].second);
+                        break;
                     }
 
                 }
                 else if(isIntersect(sec_points[k], sec_points[k+1], x,y )){
+                    cout << "The edge between " << airportList[edgeList[i].first].name 
+                    << " and "<< airportList[edgeList[i].second].name <<" is not available.\n";
                     // change weight
                     (*adjList).ChangeWeight(edgeList[i].first,edgeList[i].second);
+                    break;
                 }
             }
         }

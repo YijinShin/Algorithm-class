@@ -16,13 +16,12 @@ struct Node{
 struct Distance{
     int airport_id;
     double distance;
+    int from;
 };
 
 struct cmp{
     bool operator()(Distance a, Distance b){
-        if(a.distance > b.distance){
-            return true;
-        }else return false;
+        return a.distance > b.distance;
     }
 };
 
@@ -34,8 +33,6 @@ class AdjList{
         bool* visited; // Dijkstar에서 사용 
         //int* distance; // Dijkstar에서 사용 
         Distance* distance;
-
-        vector<int>* from;
         stack<int> shortestPath;
         
 
@@ -62,9 +59,8 @@ class AdjList{
                 distance = new Distance[V+1];
                 for(int i=1;i<=V;i++){
                     distance[i].airport_id = i;
+                    distance[i].from = 0;
                 }
-                // from array setting
-                from = new vector<int>(V+1);
         }
 
         void AddEdge(int start, int end, float weight){
@@ -88,9 +84,8 @@ class AdjList{
         void Dijkstra(int start, int end){
             priority_queue<Distance, vector<Distance>, cmp> p_que;
 
-            //from, visitied initialize
+            //visitied initialize
             for(int i=0;i<=V;i++){
-                (*from)[i] = 0;
                 visited[i] = false;
             }
 
@@ -119,14 +114,19 @@ class AdjList{
                 // curr_id의 인접리스트로 연결된 경로
                 for(auto n : adjList[curr_id]){ // 인접리스트로 연결된 경로 하나 씩 빼서
                     int next=n.airport_id; 
-                    double curr_weight = n.weight;  
-                    //cout << "curr_id: " << curr_id << "next: " << n.airport_id << "curr_weight: " << curr_weight << "\n";
+                    //자기가 온곳에 대해서는 고려 x
+                    if(next == distance[curr_id].from) continue;
+                    double curr_weight = n.weight;
+                    cout << "curr_id: " << curr_id << " next: " << n.airport_id << " distance[curr_id].distance: "<< distance[curr_id].distance <<" curr_weight: " << curr_weight << "\n";
+
                     if(distance[next].distance>distance[curr_id].distance+curr_weight){
                         distance[next].distance = distance[curr_id].distance+curr_weight;
-                        
-                        (*from)[next] = curr_id; // can find out about the previous path of next.
+                        distance[next].from = curr_id; // can find out about the previous path of next.
+                        p_que.push(distance[next]);
+                        cout << next << " id: " << curr_id << "\n";
                     }
                 }
+                cout << "next\n";
             }
         }   
 
@@ -146,8 +146,8 @@ class AdjList{
 
         void trace_path(int start, int curr_id){
             if(curr_id != start){
-                shortestPath.push((*from)[curr_id]);
-                trace_path(start,(*from)[curr_id]);
+                shortestPath.push(distance[curr_id].from);
+                trace_path(start, distance[curr_id].from);
             }
         }
 
