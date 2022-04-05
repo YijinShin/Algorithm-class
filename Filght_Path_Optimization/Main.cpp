@@ -204,11 +204,18 @@ int GetSection(Section*& sectionList){
 }
 
 int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
-    int op = a.first*b.second + b.first*c.second + c.first*a.second;
-    op -= (a.second*b.first + b.second*c.first + c.second*a.first);
-    if (op > 0)return 1;
-    else if (op == 0)return 0;
+    //int op = a.first*b.second + b.first*c.second + c.first*a.second;
+    //op -= (a.second*b.first + b.second*c.first + c.second*a.first);
+    double external = (b.first - a.first)*(c.second - a.second) - (b.second - a.second)*(c.first - a.first);
+    if (external > 0)return 1;
+    else if (external == 0)return 0;
     else return -1;
+}
+
+bool CheckEdge(){
+    // for 0 ~ edge num
+
+        // for 0~3 (line )
 }
 
 bool isIntersect(Section* sectionList, int sectionCnt){
@@ -220,7 +227,6 @@ bool isIntersect(Section* sectionList, int sectionCnt){
         pair<int, int> b = {sectionList[i].points[2], sectionList[i].points[3]};
         pair<int, int> c = {sectionList[i].points[4], sectionList[i].points[5]};
         pair<int, int> d = {sectionList[i].points[6], sectionList[i].points[7]};
-        for(int j=0;j<sectionList[i].points.size();j=j+2);
         
         // ab, bc, cb, da
 
@@ -236,6 +242,7 @@ bool isIntersect(Section* sectionList, int sectionCnt){
     }
     return false;
 }
+
 
 void Intersect_weight(AdjList* adjList){
     //교차한 vertex에 큰 weight 부하
