@@ -39,7 +39,7 @@ void Save_csv(queue<int> que, Airport* airportList, int airportCnt, bool weather
 void ShowQueue(queue<int> que, Airport* airportList, int airportCnt);
 
 int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c);
-void CheckEdgeAvailable(AdjList* adjList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt);
+void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt);
 bool isIntersect(pair<int, int> x, pair<int, int> y, pair<int, int> z, pair<int, int> r);
 
 int main(){
@@ -100,7 +100,7 @@ int main(){
             
             // 2. Dijkstra: with weather
                 // edge weight fix 
-                CheckEdgeAvailable(&adjList, sectionList, sectionCnt, edgeList, edgeCnt);
+                CheckEdgeAvailable(&adjList, airportList,sectionList, sectionCnt, edgeList, edgeCnt);
                 adjList.ShowList();
                 // Dijkstra
                 adjList.Dijkstra(start_id, end_id);
@@ -258,13 +258,13 @@ bool isIntersect(Section* sectionList, int sectionCnt){
     return false;
 }*/
  
-void CheckEdgeAvailable(AdjList* adjList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt){
+void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* sectionList, int sectionCnt, pair<int,int>* edgeList, int edgeCnt){
     pair<double, double> sec_points[4]; 
     pair<double,double> x,y;
 
     for(int i=0;i<edgeCnt;i++){ // for 1 ~ edge num
-        x = {};
-        y = {};
+        x = {airportList[edgeList[i].first].location.at(0), airportList[edgeList[i].first].location.at(1)};
+        y = {airportList[edgeList[i].second].location.at(0), airportList[edgeList[i].second].location.at(1)};
         for(int j=0;j<sectionCnt;j++){ // for 1 ~ lines forming a polygon
             // save section points
             for(int k=0;k<4;k++){

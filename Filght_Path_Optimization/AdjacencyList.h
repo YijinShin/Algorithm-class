@@ -34,7 +34,7 @@ class AdjList{
         bool* visited; // Dijkstar에서 사용 
         //int* distance; // Dijkstar에서 사용 
         Distance* distance;
-        queue<int> que; // 최단 경로 저장 
+
         vector<int>* from;
         stack<int> shortestPath;
         
@@ -87,7 +87,13 @@ class AdjList{
 
         void Dijkstra(int start, int end){
             priority_queue<Distance, vector<Distance>, cmp> p_que;
-        
+
+            /*
+            for(int i=0;i<=V;i++){
+                (*from)[i] = 0;
+            }
+            */
+
             for(int i=1;i<V+1;i++){
                 distance[i].distance = INT_MAX;
             }
@@ -146,10 +152,16 @@ class AdjList{
         }
 
         void ChangeWeight(int a, int b){
-            int i=0;
-            for(i=0;i<adjList[a].size();i++){
+            // edge a->b
+            for(int i=0;i<adjList[a].size();i++){
                 if(adjList[a].at(i).airport_id ==  b){ 
-                        adjList[a].at(i).weight = INT_MAX;
+                        adjList[a].at(i).weight = 1000000;
+                }
+            }
+            // edge b->a
+            for(int i=0;i<adjList[b].size();i++){
+                if(adjList[b].at(i).airport_id ==  a){ 
+                        adjList[b].at(i).weight = 1000000;
                 }
             }
         }
