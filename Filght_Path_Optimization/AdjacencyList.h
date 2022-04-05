@@ -88,16 +88,16 @@ class AdjList{
         void Dijkstra(int start, int end){
             priority_queue<Distance, vector<Distance>, cmp> p_que;
 
-            /*
+            //from, visitied initialize
             for(int i=0;i<=V;i++){
                 (*from)[i] = 0;
+                visited[i] = false;
             }
-            */
 
+            //distance initialize
             for(int i=1;i<V+1;i++){
                 distance[i].distance = INT_MAX;
-            }
-            //시작점
+            }  
             distance[start].distance = 0;
 
             // put all V in p_que (작은 distance를 우선순위)
