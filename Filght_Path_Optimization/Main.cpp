@@ -1,17 +1,11 @@
-#include <iostream>
-#include <vector>
 #include <map>
-#include <queue>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <cmath>
-#include <stack>
 #include "AdjacencyList.h"
 
 using namespace std;
-
-// M_PI는 cmath 헤더 안에 미리 선언되어있습니다:)
 
 struct Airport{ // airport info 
     int id;
@@ -93,6 +87,7 @@ int main(){
                 // print result
                 cout << "Shortest path (not consider weather): ";
                 shortestPath_without_weather=adjList.path_queue(start_id, end_id);
+                // save result
                 Save_csv(shortestPath_without_weather, airportList, airportCnt, 0);
                 ShowQueue(shortestPath_without_weather, airportList, airportCnt);
 
@@ -105,6 +100,7 @@ int main(){
                 // print result
                 cout << "Shortest path (consider weather): ";
                 shortestPath_weather = adjList.path_queue(start_id, end_id);
+                // save result
                 Save_csv(shortestPath_weather, airportList, airportCnt, 1);
                 ShowQueue(shortestPath_weather, airportList, airportCnt);
         
@@ -215,8 +211,6 @@ int GetSection(Section*& sectionList){
 }
 
 int ccw(pair<int, int> a, pair<int, int> b, pair<int, int> c) {
-    //int op = a.first*b.second + b.first*c.second + c.first*a.second;
-    //op -= (a.second*b.first + b.second*c.first + c.second*a.first);
     double external = (b.first - a.first)*(c.second - a.second) - (b.second - a.second)*(c.first - a.first);
     if (external > 0)return 1;
     else if (external == 0)return 0;
@@ -287,10 +281,9 @@ void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* section
     }
 }
 
-
 double CalcWeight(vector<double> start, vector<double> end){
-    double weight;
     // Haversine Formula
+    double weight;
     double radius = 6371; // earth radius (km)  
     double toRadian = M_PI / 180;
 
@@ -299,10 +292,11 @@ double CalcWeight(vector<double> start, vector<double> end){
 
     double sinDeltaLat = sin(deltaLatitude / 2);
     double sinDeltaLng = sin(deltaLongitude / 2);
-    double squareRoot = sqrt( sinDeltaLat * sinDeltaLat + cos(start[0] * toRadian) * cos(end[0] * toRadian) * sinDeltaLng * sinDeltaLng);
+    double squareRoot = sqrt( sinDeltaLat * sinDeltaLat + cos(start[0] * toRadian) 
+                        * cos(end[0] * toRadian) * sinDeltaLng * sinDeltaLng);
 
     weight = 2 * radius * asin(squareRoot);
-
+  
     return weight;
 }
 
@@ -325,7 +319,9 @@ int FindAirport_NametoId(string name, Airport* airportList, int airportCnt){
 }
 
 void ShowAirportList(Airport* airportList, int airportCnt){
-    for(int i=1;i<=airportCnt;i++) cout << airportList[i].id << " / "<< airportList[i].name << " / " << airportList[i].type << " / "<< airportList[i].IATA << " / "<< airportList[i].ICAO << " / "<< airportList[i].location[0] << " / "<< airportList[i].location[1] << endl;
+    for(int i=1;i<=airportCnt;i++) cout << airportList[i].id << " / "<< airportList[i].name << 
+    " / " << airportList[i].type << " / "<< airportList[i].IATA << " / "<< airportList[i].ICAO <<
+     " / "<< airportList[i].location[0] << " / "<< airportList[i].location[1] << endl;
 }
 
 void ShowSectionList(Section* sectionList, int sectionCnt){
