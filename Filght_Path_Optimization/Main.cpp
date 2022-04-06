@@ -89,7 +89,7 @@ int main(){
             // 1. Dijkstra: without weather
                 //Dijkstra
                 adjList.ShowList();
-                adjList.Dijkstra(start_id, end_id);
+                adjList.Dijkstra(start_id);
                 // print result
                 cout << "Shortest path (not consider weather): ";
                 shortestPath_without_weather=adjList.path_queue(start_id, end_id);
@@ -101,7 +101,7 @@ int main(){
                 CheckEdgeAvailable(&adjList, airportList,sectionList, sectionCnt, edgeList, edgeCnt);
                 adjList.ShowList();
                 // Dijkstra
-                adjList.Dijkstra(start_id, end_id);
+                adjList.Dijkstra(start_id);
                 // print result
                 cout << "Shortest path (consider weather): ";
                 shortestPath_weather = adjList.path_queue(start_id, end_id);
