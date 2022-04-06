@@ -81,7 +81,7 @@ class AdjList{
             }
         }
 
-        void Dijkstra(int start, int end){
+        void Dijkstra(int start){
             priority_queue<Distance, vector<Distance>, cmp> p_que;
 
             //visitied initialize
@@ -118,11 +118,11 @@ class AdjList{
                     if(next == distance[curr_id].from) continue;
                     double curr_weight = n.weight;
                     cout << "curr_id: " << curr_id << " next: " << n.airport_id << " distance[curr_id].distance: "<< distance[curr_id].distance <<" curr_weight: " << curr_weight << "\n";
-
-                    if(distance[next].distance>distance[curr_id].distance+curr_weight){
-                        distance[next].distance = distance[curr_id].distance+curr_weight;
+                    double t = distance[curr_id].distance+curr_weight;
+                    if(distance[next].distance>t){
+                        distance[next].distance = t;
                         distance[next].from = curr_id; // can find out about the previous path of next.
-                        p_que.push(distance[next]);
+                        p_que.push(distance[next]); // ?
                         cout << next << " id: " << curr_id << "\n";
                     }
                 }
