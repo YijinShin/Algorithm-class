@@ -222,26 +222,22 @@ bool isIntersect(pair<int, int> a, pair<int, int> b, pair<int, int> c, pair<int,
     int ab = ccw(a,b,c)*ccw(a,b,d);
     int cd = ccw(c,d,a)*ccw(c,d,b);
 
-    // 평행하면 ab, cd 둘다 0이다.
+    // if pararall, ab = cd = 0
     if(ab == 0 && cd == 0){
-        // 평행한데 겹치는 경우 true, 안겹치면 false;
-        // x축 평행인지, y축평행인지 판별
         if(a.first == c.first){
-            //y축 방향으로 평행
+            //  If parallel in the y-axis direction, verify that the two lines overlap 
             if (a.second > b.second)swap(a.second, b.second);
             if (c.second > d.second)swap(c.second, d.second);
             return (c.second <= b.second && a.second <= d.second);
         }
         else if(a.second == c.second){
-            //x축 방향으로 평행
+            // If parallel in the x-axis direction, verify that the two lines overlap 
             if (a.first > b.first)swap(a.first, b.first);
             if (c.first > d.first)swap(c.first, d.first);
             return (c.first <= b.first && a.first <= d.first);
         }
         
     }
-    //평행하지 않지만 겹치는 경우 true;
-    //평행하지 않지만 안겹치는 경우 false;
     return ( ab<=0 && cd<=0);
 }  
  

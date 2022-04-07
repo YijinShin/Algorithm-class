@@ -30,9 +30,8 @@ class AdjList{
         vector<Node>* adjList;
         int V; // vertex num
         int E; // edge num
-        bool* visited; // Dijkstar에서 사용 
-        //int* distance; // Dijkstar에서 사용 
-        Distance* distance;
+        bool* visited; // use in Dijkstra
+        Distance* distance;//use in Dijkstra
         stack<int> shortestPath;
         
 
@@ -47,10 +46,10 @@ class AdjList{
         }
         
         void AdjListSetting(int vertexNum){ 
-            // adjList에 공항 수만큼 할당(node 수 만큼)
-                // V 갱신 
+            // Assign to adjList by number of airports (by number of nodes)
+	            //renew V  
                 V = vertexNum;
-                // 공항 수 만큼 adjList 생성  
+                // Create adjList by number of airports 
                 adjList = new vector<Node>[V+1];
                 // visited array setting
                 visited = new bool[V+1];
@@ -95,7 +94,7 @@ class AdjList{
             }  
             distance[start].distance = 0;
 
-            // put all V in p_que (작은 distance를 우선순위)
+            // put all V in p_que (small distance)
             for(int i=1;i<V+1;i++){
                 p_que.push(distance[i]);
             }
@@ -111,13 +110,11 @@ class AdjList{
                 // check visited
                 visited[curr_id] =true;
                 // heapify
-                // curr_id의 인접리스트로 연결된 경로
-                for(auto n : adjList[curr_id]){ // 인접리스트로 연결된 경로 하나 씩 빼서
+                for(auto n : adjList[curr_id]){ 
                     int next=n.airport_id; 
-                    //자기가 온곳에 대해서는 고려 x
                     if(next == distance[curr_id].from) continue;
                     double curr_weight = n.weight;
-                   // cout << "curr_id: " << curr_id << " next: " << n.airport_id << " distance[curr_id].distance: "<< distance[curr_id].distance <<" curr_weight: " << curr_weight << "\n";
+                    // cout << "curr_id: " << curr_id << " next: " << n.airport_id << " distance[curr_id].distance: "<< distance[curr_id].distance <<" curr_weight: " << curr_weight << "\n";
                     double t = distance[curr_id].distance+curr_weight;
                     if(distance[next].distance>t){
                         distance[next].distance = t;
