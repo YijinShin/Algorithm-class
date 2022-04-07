@@ -3,7 +3,8 @@
 * notion: https://www.notion.so/Flight-Path-Optimization-52e4cd771bda4b47ab325f1245b1f2f7
 
 
-
+## Program Introduction
+This program find the shortest path between six airports in Korea by using Dijkstra algorithm.
 
 ## How to use
 1. Complie. "g++ -std=c++11 Main.cpp -o a.out"
