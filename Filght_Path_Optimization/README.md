@@ -6,6 +6,10 @@
 ## Program Introduction
 This program find the shortest path between six airports in Korea by using Dijkstra algorithm.
 
+## Data of South_Korea_airport_toy_example.csv  
+<img width="389" alt="스크린샷 2022-04-08 오후 3 40 55" src="https://user-images.githubusercontent.com/49178058/162379005-69d0de2c-ac4b-4d78-ad74-65ba10c3bc1e.png">
+
+
 ## How to use
 1. Complie. "g++ -std=c++11 Main.cpp -o a.out"
 2. Enter the number of paths between airports.
