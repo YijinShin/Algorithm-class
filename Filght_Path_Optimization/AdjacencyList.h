@@ -114,16 +114,16 @@ class AdjList{
                     int next=n.airport_id; 
                     if(next == distance[curr_id].from) continue;
                     double curr_weight = n.weight;
-                    // cout << "curr_id: " << curr_id << " next: " << n.airport_id << " distance[curr_id].distance: "<< distance[curr_id].distance <<" curr_weight: " << curr_weight << "\n";
+                    cout << "curr_id: " << curr_id << " next: " << n.airport_id << " distance[curr_id].distance: "<< distance[curr_id].distance <<" curr_weight: " << curr_weight << "\n";
                     double t = distance[curr_id].distance+curr_weight;
                     if(distance[next].distance>t){
                         distance[next].distance = t;
                         distance[next].from = curr_id; // can find out about the previous path of next.
-                        p_que.push(distance[next]); // ?
-                        //cout << next << " id: " << curr_id << "\n";
+                        //p_que.push(distance[next]); // ?
+                        cout << next << " id: " << curr_id << "\n";
                     }
                 }
-                //cout << "next\n";
+                //cout << "next\n"; 
             }
         }   
 
