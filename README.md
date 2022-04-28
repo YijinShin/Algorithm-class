@@ -4,3 +4,4 @@
 Team project
 -------------
 * Flight Path Optimization using Dijkstra’s Algorithm
+* Traveling Salesman Problem with Generic Altorithm
