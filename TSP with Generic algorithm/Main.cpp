@@ -21,7 +21,7 @@ int main(int argc, char** argv){ // execute: ./a.out filename.csv
     greedy.Greedy(adjMatrix, 0, deliveryLocationNum);
 
     //Generic
-    genetic.Genetic(deliveryLocationNum);
+    genetic.Genetic(deliveryLocationNum,adjMatrix);
 
     return 0;
 }
