@@ -47,7 +47,7 @@ class GreedyAlgorithm{
                 currentPoint = minWeight;
             }
 
-            cout << "soluetion: \n";    
+            cout << "[Greedy soluetion] : ";    
             for(int i=0;i<deliveryLocationNum;i++) cout<< solution[i]<<", ";
             cout << endl <<endl;
         }
