@@ -9,9 +9,10 @@ using namespace std;
 class GeneticAlgorithm{
     private:
         int deliveryLocationNum = 0;
-        vector<vector<int>> InitialPopulation;
+        vector<vector<int>> Population;
+        double** adjMatrix;
 
-        //create initial population
+        #pragma region Initialization
         void CreateInitialPopulation() {
             int initPopulationSize = 30;
             srand(time(NULL));
@@ -22,7 +23,7 @@ class GeneticAlgorithm{
 
             for (int i = 0; i < initPopulationSize; i++) {
                 stand_arr = CreateRandomSolution(stand_arr);
-                InitialPopulation.push_back(stand_arr);
+                Population.push_back(stand_arr);
             }
         }
         // create one random solution
@@ -39,15 +40,28 @@ class GeneticAlgorithm{
             cout << "\n";
             return stand_arr;
         }
-        //selection
+        #pragma endregion
+
+        #pragma region Selection
+        void Selection(){
+            vector<vector<int>> ParentSet;
+
+        }
+        // elitism
+        void Elitism(){
+            
+        }
+        // Roulette wheel Selection 
+        #pragma endregion
 
         //reproduction
         //replacement
 
     public:
         // generic main function
-        void Genetic(int locNum){
+        void Genetic(int locNum, double** matrix){
             deliveryLocationNum = locNum;
+            adjMatrix = matrix;
             //create initial population
             CreateInitialPopulation();
             
