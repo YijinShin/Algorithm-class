@@ -2,24 +2,26 @@
 #include <fstream>
 #include <string>
 #include "DataPreprocessing.h"
-#include "Greedy.h"
+#include "GreedyAlgorithm.h"
+#include "GeneticAlgorithm.h"
 using namespace std;
 
 int main(int argc, char** argv){ // execute: ./a.out filename.csv
     int deliveryLocationNum = 0;
     Preprocessing preprocessing;
-    Greedy greedy;
+    GreedyAlgorithm greedy;
+    GeneticAlgorithm genetic;
 
     //get data and do pre-processing
     deliveryLocationNum = preprocessing.ReadData("Cincinnati.csv"); 
     double **adjMatrix = preprocessing.ConstructAdjMatrix();
-    preprocessing.ShowAdjMatrix(adjMatrix);
+    //preprocessing.ShowAdjMatrix(adjMatrix);
 
     //Greedy
-    greedy.GreedyAlgorithm(adjMatrix, 0, deliveryLocationNum);
-
+    greedy.Greedy(adjMatrix, 0, deliveryLocationNum);
 
     //Generic
+    
 
     return 0;
 }
