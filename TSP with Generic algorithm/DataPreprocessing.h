@@ -16,11 +16,11 @@ class Preprocessing{
     private:
         int deliveryLocationNum = 0;
         DeliveryLocation* DeliveryLocationList;
+        double** adjMatrix;
     public:
         // read csv()
         int ReadData(string filename)
         {
-            int file_lines = 0;
             fstream fs; 
             vector<string> lines;
             string line;
@@ -32,24 +32,26 @@ class Preprocessing{
             getline(fs, line); 
             while(getline(fs, line)){
                 lines.push_back(line); // cut by '\n'
-                file_lines++;
+                deliveryLocationNum++;
             }
-            cout << "index: "<< file_lines<< endl;
+            cout << "index: "<< deliveryLocationNum<< endl;
+
 
             // Create and setting node list
-            DeliveryLocationList = new DeliveryLocation[file_lines+1]; // make Node list, 0은 사용하지 x
-            for(int i=1;i<=file_lines;i++){ // cut by ',' and make Node
-                istringstream ss(lines[i-1]);
-                //DeliveryLocationList[i].id = i;
+            DeliveryLocationList = new DeliveryLocation[deliveryLocationNum]; // make Node list, 0은 사용하지 x
+            for(int i=0;i<deliveryLocationNum;i++){ // cut by ',' and make Node
+                istringstream ss(lines[i]);
+                getline(ss, line, ',');
                 DeliveryLocationList[i].id = (stof(line));
                 getline(ss, line, ',');
                 DeliveryLocationList[i].location.first = (stof(line));
                 getline(ss, line, ',');
                 DeliveryLocationList[i].location.second = (stof(line));
+                //cout << DeliveryLocationList[i].id << "," << DeliveryLocationList[i].location.first << ","<<DeliveryLocationList[i].location.second<<endl;
             }
             cout << endl;
             fs.close();
-            return file_lines;
+            return deliveryLocationNum;
         }
 
         // save csv()  
@@ -75,8 +77,10 @@ class Preprocessing{
         }
 
         // make adj matrix(), return adj matrix 
-        double* ConstructAdjMatrix(){
-            double adjMatrix[deliveryLocationNum][deliveryLocationNum];
+        double** ConstructAdjMatrix(){
+            //double adjMatrix[deliveryLocationNum][deliveryLocationNum];
+            adjMatrix = new double*[deliveryLocationNum];
+            for(int i=0;i<deliveryLocationNum;i++){adjMatrix[i] = new double[deliveryLocationNum];}
             // calc weight of each edges
             for(int i=0;i<deliveryLocationNum;i++){
                 for(int j=0;j<deliveryLocationNum;j++){
@@ -88,6 +92,16 @@ class Preprocessing{
                     }
                 }   
             }
-            return (*adjMatrix);
+            return adjMatrix;
         }
+
+        // show AdjMatrix
+        void ShowAdjMatrix(double **matrix){
+            for(int i=0;i<deliveryLocationNum;i++){
+                for(int j=0;j<deliveryLocationNum;j++){
+                    cout << matrix[i][j] << "  /  ";
+                }    
+                cout <<endl;
+            }
+        }   
 };

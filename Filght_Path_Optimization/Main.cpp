@@ -280,7 +280,7 @@ void CheckEdgeAvailable(AdjList* adjList, Airport* airportList, Section* section
 double CalcWeight(vector<double> start, vector<double> end){
     // Haversine Formula
     double weight;
-    double radius = 6371; // earth radius (km)  
+    double radius = 6378; // earth radius (km)  
     double toRadian = M_PI / 180;
 
     double deltaLatitude = abs(start[0] - end[0]) * toRadian;
