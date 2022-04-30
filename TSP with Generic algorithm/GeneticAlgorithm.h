@@ -27,7 +27,7 @@ class GeneticAlgorithm{
     private:
         int deliveryLocationNum = 0;
         int startPoint;
-        vector<Individual> ParentSet;
+        vector<Individual> parentSet;
         vector<Individual> population; 
         priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> populationInfo;
         double** adjMatrix;
@@ -59,6 +59,14 @@ class GeneticAlgorithm{
                 cout <<"\n";
             }
         }
+
+        void voidPrintArray(vector<int> array){
+            for (int i = 0; i < array.size(); i++) {
+                cout << array[i] << " ";
+            }
+            cout<<"\n";
+        }
+
         #pragma endregion
 
         #pragma region Initialization
@@ -84,10 +92,11 @@ class GeneticAlgorithm{
                 info.fitness = fitness;
                 info.index = population.size()-1;
                 populationInfo.push(info);
-
+                
                 cout << info.index<< ": ";
                 for(int j=0;j<individual.array.size();j++) cout << individual.array[j]<<" ";
                 cout << info.fitness<< "\n";
+                
             }            
         }
 
@@ -121,7 +130,7 @@ class GeneticAlgorithm{
             for(int i=0;i<population.size();i++) indexList[i] = i;
 
             // randomly listup individuals
-            for(int i=0;i<repeatNum;i++){
+            for(int i=0;i<population.size();i++){
                 c1 = rand() % population.size();
                 c2 = rand() % population.size();
                 swap(indexList[c1], indexList[c2]);
@@ -130,13 +139,13 @@ class GeneticAlgorithm{
             for(int i=0;i<repeatNum;i++){
                     //cout <<indexList[2*i] <<"  vs  "<<indexList[2*i+1]<<endl;
                 //compete (small fitness is winner)
-                if(population[indexList[i]].fitness < population[indexList[i+1]].fitness) // i is winner
-                    ParentSet.push_back(population[indexList[i]]);
+                if(population[indexList[2*i]].fitness < population[indexList[2*i+1]].fitness) // i is winner
+                    parentSet.push_back(population[indexList[2*i]]);
                 else // i+1 is winner
-                    ParentSet.push_back(population[indexList[i+1]]); 
+                    parentSet.push_back(population[indexList[2*i+1]]); 
             }
             cout << "------- Parent set--------\n";
-            //PrintIndividualSet(ParentSet);
+            PrintIndividualSet(parentSet);
         }
         
         // Roulette wheel Selection 
@@ -174,56 +183,53 @@ class GeneticAlgorithm{
             swap(populationInfo, eliteInfo);
 
             //PrintIndividualSetWithInfo(population, populationInfo);
+            PrintIndividualSet(population);
         }
 
         #pragma endregion
 
-        //reproduction
         #pragma region Reproduction
         void Reproduction(){
-            for(int i=0;i<ParentSet.size()/2;i++){
-                Crossover(population[2*i].array, population[2*i+1].array);
+            for(int i=0;i < parentSet.size()/2;i++){
+                cout <<"(crossover: "<<i<<"): "<<2*i<<","<<2*i+1<<endl;
+                Crossover(parentSet[2*i].array, parentSet[2*i+1].array);
             }
+            // clear parenet set
+            parentSet.clear();
             cout<<"-----------New generation(after Reproduction)-----------\n";
             //PrintIndividualSetWithInfo(population, populationInfo);
-            PrintIndividualSet(population);
-            
-
+            //PrintIndividualSet(population);
         }
 
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
+            //cout <<&a_child[0]<<","<<&a[0]<<"\n";
+            //a_child = a;
+            //cout <<&a_child[0]<<","<<&a[0]<<"\n";
             vector<int> b_child = b;
             queue<int> a_range;//swap 전 해당 구간의 a 원소
             queue<int> b_range;//swap 전 해당 구간의 b 원소
             vector<int> a_exist; //b에 이미 존재했던 a_range의 원소의 index
             vector<int> b_exist; //a에 이미 존재했던 b_range의 원소의 index
+            int mutationProbability = 5;
+            int mutationRandomnum;
 
             int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
             int end = 6;
-
-            cout << "strat: " << start << "end: " << end << "\n";
+            //cout << "strat: " << start << "end: " << end << "\n";
 
             cout << "a_array: ";
-            for (int i = 0; i < a.size(); i++) {
-                cout << a[i] << " ";
-            }
-            cout << "\n";
-
+            voidPrintArray(a);
             cout << "b_array: ";
-            for (int i = 0; i < b.size(); i++) {
-                cout << b[i] << " ";
-            }
-            cout << "\n";
-
-
+            voidPrintArray(b);
+            
+//----------------------------------------------segmentation fault 발생 구역 
             //해당 구간에 대한 swaping
             for (int i = start; i < end; i++) {
                 a_range.push(a_child[i]);
                 b_range.push(b_child[i]);
                 swap(a_child[i], b_child[i]);
             }
-
             while (a_range.size() != 0 || b_range.size() != 0) {
                 int a_front = a_range.front();
                 int b_front = b_range.front();
@@ -245,26 +251,23 @@ class GeneticAlgorithm{
             sort(b_exist.begin(), b_exist.end());
 
             for (int i = 0; i < a_exist.size(); i++) {
-                a_child[b_exist[i]] = b[a_exist[i]];
-                b_child[a_exist[i]] = a[b_exist[i]];
+                swap(b[a_exist[i]], a_child[b_exist[i]]);
+                //a_child[b_exist[i]] = b[a_exist[i]];
+                //b_child[a_exist[i]] = a[b_exist[i]];
             }
-
-            cout << "a'_array: ";
-            for (int i = 0; i < a.size(); i++) {
-                cout << a_child[i] << " ";
-            }
-            cout << "\n";
-
-            cout << "b'_array: ";
-            for (int i = 0; i < b.size(); i++) {
-                cout << b_child[i] << " ";
-            }
-            cout << "\n";
-
-            //Probabilistic Mutations 
+//----------------------------------------------
+            cout << "a_child_array: ";
+            voidPrintArray(a_child);
+            cout << "b_child_array: ";
+            voidPrintArray(b_child);
             
 
-
+            //Probabilistic Mutations 
+            mutationRandomnum = rand()%100;
+            if(mutationRandomnum < mutationProbability) a_child = Mutation(a_child);
+            mutationRandomnum = rand()%100;
+            if(mutationRandomnum < mutationProbability) b_child = Mutation(b_child);
+            
             // save new child to population(next generation)
             Individual c1, c2;
             IndividualInfo c1Info, c2Info;
@@ -284,9 +287,37 @@ class GeneticAlgorithm{
             populationInfo.push(c2Info);
         }
 
-        void Mutation(vector<int> a){
+        vector<int> Mutation(vector<int> a){
+            vector<int> a_mutation = a;
+
+            //Reverse Sequence Mutation(RSM)
+            int start = rand() % deliveryLocationNum;
+            int end = rand() % deliveryLocationNum;
             
+            //start,end 구간 랜덤 설정
+            while (start == end) {
+                int start = rand() % deliveryLocationNum;
+                int end = rand() % deliveryLocationNum;
+            }
+            if (start > end) swap(start, end);
+            //cout << "strat: " << start << "end: " << end << "\n";
+
+            while (start < end) {
+                swap(a_mutation[start], a_mutation[end]);
+                start++;
+                end--;
+            }
+
+            /*
+            cout << "a'_array: ";
+            for (int i = 0; i < a.size(); i++) {
+                cout << a_mutation[i] << " ";
+            }
+            cout << "\n";
+            */
+            return a_mutation;
         }
+
         #pragma endregion
 
     public:
@@ -297,11 +328,17 @@ class GeneticAlgorithm{
             startPoint = start;
             //create initial population
             CreateInitialPopulation();
-            //selection
-            Selection();
-            //reproduction
-            Reproduction();
-
+            
+            for(int i=0;i<4;i++){
+                cout << endl<<"["<<i<<"]"<<endl;
+                //selection
+                Selection();
+                //reproduction
+                Reproduction();
+                PrintIndividualSet(population);
+            }
+            cout<<"-----------Result sol -------------\n";
+            PrintIndividualSetWithInfo(population, populationInfo);
         }
 
 };
