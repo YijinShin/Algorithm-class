@@ -1,0 +1,6 @@
+<Reproduction>
+crossover
+- https://downloads.hindawi.com/journals/cin/2017/7430125.pdf
+
+mutation
+- https://arxiv.org/ftp/arxiv/papers/1203/1203.3099.pdf
