@@ -21,10 +21,12 @@ struct cmp{
 class GeneticAlgorithm{
     private:
         int deliveryLocationNum = 0;
-        vector<vector<int>> Population;
-        priority_queue<SolutionInfo, vector<SolutionInfo>, cmp> PopulationInfo;
+        vector<vector<int>> ParentSet;
+        vector<vector<int>> population;
+        priority_queue<SolutionInfo, vector<SolutionInfo>, cmp> populationInfo;
         double** adjMatrix;
 
+        #pragma region etc
         double CalcFitness(vector<int> solutionArray){
             double fitness = 0.0;
 
@@ -36,15 +38,15 @@ class GeneticAlgorithm{
             return fitness;  
         }
         
-        void PrintPopulationInfo(){ // the function pop all elements from the queue. 
-            cout << "-----[print solution + info]--------\n";
-            for(int i=0;i<Population.size();i++){
-                cout << PopulationInfo.top().index << ": ";
-                for(int j=0;j<deliveryLocationNum;j++) cout << Population[PopulationInfo.top().index][j]<<" ";
-                cout <<PopulationInfo.top().fitness << "\n";
-                PopulationInfo.pop();
+        void PrintSolutionInfo(vector<vector<int>> solSet, priority_queue<SolutionInfo, vector<SolutionInfo>, cmp>  solInfo){ // the function pop all elements from the queue. 
+            for(int i=0;i<solSet.size();i++){
+                cout << solInfo.top().index << ": ";
+                for(int j=0;j<deliveryLocationNum;j++) cout << solSet[solInfo.top().index][j]<<" ";
+                cout <<solInfo.top().fitness << "\n";
+                solInfo.pop();
             }
         }
+        #pragma endregion
 
         #pragma region Initialization
         void CreateInitialPopulation() {
@@ -56,24 +58,25 @@ class GeneticAlgorithm{
             SolutionInfo solutionInfo;
 
             for(int i=0;i<deliveryLocationNum;i++) stand_arr.push_back(i);
-
+            cout << "-------- Initial population --------\n";
             for (int i = 0; i < initPopulationSize; i++) {
                 // get solution, push solution into population
                 stand_arr = CreateRandomSolution(stand_arr);
-                Population.push_back(stand_arr);
+                population.push_back(stand_arr);
 
                 // get fitness and index of solution, push solution info to populationinfo
                 solutionInfo.fitness = CalcFitness(stand_arr);
-                solutionInfo.index = Population.size()-1;
-                PopulationInfo.push(solutionInfo);
+                solutionInfo.index = population.size()-1;
+                populationInfo.push(solutionInfo);
 
                 cout << solutionInfo.index<< ": ";
                 for(int j=0;j<stand_arr.size();j++) cout << stand_arr[j]<<" ";
                 cout << solutionInfo.fitness<< "\n";
             }
 
-            //print population
-            PrintPopulationInfo();
+            /*print population 
+            (if you use this, you have to stop program because this func pop all elements from priority queue)*/
+            //PrintPopulationInfo();
         }
 
         // create one random solution
@@ -91,17 +94,45 @@ class GeneticAlgorithm{
         #pragma region Selection
         void Selection(){
             vector<vector<int>> ParentSet;
-
-        }
-        // elitism
-        void Elitism(){
             
+
+            // Elitism
+            Elitism(10);
+        }
+        // Elitism
+        void Elitism(int percent){
+            int eliteNum = population.size()*percent/100;
+            vector<vector<int>> elite;
+            priority_queue<SolutionInfo, vector<SolutionInfo>, cmp> eliteInfo;
+            int eliteIndex;
+            SolutionInfo info;
+            
+            cout << "----- new generation(elite only): "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")--------\n";
+            
+            for(int i=0;i<eliteNum;i++){
+                // save elite solution to elite vector
+                eliteIndex = populationInfo.top().index;
+                    // save elite soluation 
+                elite.push_back(population[eliteIndex]); 
+                    // save elite soluation info
+                info.index = elite.size()-1;
+                info.fitness = populationInfo.top().fitness;
+                eliteInfo.push(info);
+                // delete elite solution from current population 
+                population.erase(population.begin() + eliteIndex);
+                populationInfo.pop();
+                cout <<"elite(index,fitness): "<<info.index<<","<<info.fitness<<"\n";
+            }
+
+            // change current generation population and elite population
+            population.clear();
+            elite.swap(population); // swap delete previous vector. 
+            swap(populationInfo, eliteInfo);
+
+            //PrintSolutionInfo(population, populationInfo);
         }
         // Roulette wheel Selection 
-        // Sorting population
-        void SortingPopulation(){
 
-        }
         #pragma endregion
 
         //reproduction
@@ -114,6 +145,8 @@ class GeneticAlgorithm{
             adjMatrix = matrix;
             //create initial population
             CreateInitialPopulation();
+            //selection
+            Selection();
         }
 
 };
