@@ -8,10 +8,18 @@
 using namespace std;
 
 
-class Greedy{
+class GreedyAlgorithm{
+    private:
+        //cheack all node visitied
+        bool CheckAllVisited(bool *visitied, int deliveryLocationNum){
+            for(int i=0;i<deliveryLocationNum;i++){
+                if(!visitied[i]) return false;
+            }
+            return true;
+        }
     public:
         //  matrix 받아서 greedy 알고리즘 실행 
-        void GreedyAlgorithm(double **adjMatrix, int startPoint, int deliveryLocationNum){
+        void Greedy(double **adjMatrix, int startPoint, int deliveryLocationNum){
             bool visited[deliveryLocationNum];
             for(int i=0;i<deliveryLocationNum;i++) visited[i] = false;
             
@@ -23,9 +31,9 @@ class Greedy{
 
             while(1){
                 visited[currentPoint] = true;
-                    cout << "Visited["<< currentPoint<<"]"<<endl;
+                    //cout << "Visited["<< currentPoint<<"]"<<endl;
                 solution[solutionIndex] = currentPoint;
-                    cout << "solution["<< solutionIndex<<"]: "<<currentPoint<<endl;
+                    //cout << "solution["<< solutionIndex<<"]: "<<currentPoint<<endl;
                 if(CheckAllVisited(visited, deliveryLocationNum))break;
                 
                 minWeight = currentPoint;
@@ -39,15 +47,8 @@ class Greedy{
                 currentPoint = minWeight;
             }
 
-            cout << "soluetion: \n";    
+            cout << "[Greedy soluetion] : ";    
             for(int i=0;i<deliveryLocationNum;i++) cout<< solution[i]<<", ";
             cout << endl <<endl;
-        }
-
-        bool CheckAllVisited(bool *visitied, int deliveryLocationNum){
-            for(int i=0;i<deliveryLocationNum;i++){
-                if(!visitied[i]) return false;
-            }
-            return true;
         }
 };      
