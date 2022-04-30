@@ -7,13 +7,18 @@
 #include <time.h>
 using namespace std;
 
-struct SolutionInfo{
+struct IndividualInfo{
     int index;
     double fitness;
 };
 
+struct Individual{
+    vector<int> array;
+    double fitness;
+};
+
 struct cmp{
-    bool operator()(SolutionInfo a, SolutionInfo b){
+    bool operator()(IndividualInfo a, IndividualInfo b){
         return a.fitness > b.fitness;
     }
 };
@@ -21,9 +26,9 @@ struct cmp{
 class GeneticAlgorithm{
     private:
         int deliveryLocationNum = 0;
-        vector<vector<int>> ParentSet;
-        vector<vector<int>> population;
-        priority_queue<SolutionInfo, vector<SolutionInfo>, cmp> populationInfo;
+        vector<Individual> ParentSet;
+        vector<Individual> population; 
+        priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> populationInfo;
         double** adjMatrix;
 
         #pragma region etc
@@ -38,12 +43,19 @@ class GeneticAlgorithm{
             return fitness;  
         }
         
-        void PrintSolutionInfo(vector<vector<int>> solSet, priority_queue<SolutionInfo, vector<SolutionInfo>, cmp>  solInfo){ // the function pop all elements from the queue. 
-            for(int i=0;i<solSet.size();i++){
-                cout << solInfo.top().index << ": ";
-                for(int j=0;j<deliveryLocationNum;j++) cout << solSet[solInfo.top().index][j]<<" ";
-                cout <<solInfo.top().fitness << "\n";
-                solInfo.pop();
+        void PrintIndividualSetWithInfo(vector<Individual> popSet, priority_queue<IndividualInfo, vector<IndividualInfo>, cmp>  popInfo){ // the function pop all elements from the queue. 
+            for(int i=0;i<popSet.size();i++){
+                cout << popInfo.top().index << ": ";
+                for(int j=0;j<deliveryLocationNum;j++) cout << popSet[popInfo.top().index].array[j]<<" ";
+                cout <<popInfo.top().fitness << "\n";
+                popInfo.pop();
+            }
+        }
+
+        void PrintIndividualSet(vector<Individual> set){
+            for(int i=0;i<set.size();i++){
+                for(int j=0;j<deliveryLocationNum;j++) cout << set[i].array[j]<<" ";
+                cout <<"\n";
             }
         }
         #pragma endregion
@@ -54,29 +66,28 @@ class GeneticAlgorithm{
             srand(time(NULL));
 
             //setting standard array
-            vector<int> stand_arr;
-            SolutionInfo solutionInfo;
-
-            for(int i=0;i<deliveryLocationNum;i++) stand_arr.push_back(i);
+            double fitness;
+            Individual individual;
+            IndividualInfo info;
+            
+            for(int i=0;i<deliveryLocationNum;i++) individual.array.push_back(i);
             cout << "-------- Initial population --------\n";
             for (int i = 0; i < initPopulationSize; i++) {
-                // get solution, push solution into population
-                stand_arr = CreateRandomSolution(stand_arr);
-                population.push_back(stand_arr);
+                // get solution, push individual into population
+                individual.array = CreateRandomSolution(individual.array);
+                fitness = CalcFitness(individual.array);
+                individual.fitness = fitness;
+                population.push_back(individual);
 
-                // get fitness and index of solution, push solution info to populationinfo
-                solutionInfo.fitness = CalcFitness(stand_arr);
-                solutionInfo.index = population.size()-1;
-                populationInfo.push(solutionInfo);
+                // get fitness and index of individual, push individual info to populationinfo
+                info.fitness = fitness;
+                info.index = population.size()-1;
+                populationInfo.push(info);
 
-                cout << solutionInfo.index<< ": ";
-                for(int j=0;j<stand_arr.size();j++) cout << stand_arr[j]<<" ";
-                cout << solutionInfo.fitness<< "\n";
-            }
-
-            /*print population 
-            (if you use this, you have to stop program because this func pop all elements from priority queue)*/
-            //PrintPopulationInfo();
+                cout << info.index<< ": ";
+                for(int j=0;j<individual.array.size();j++) cout << individual.array[j]<<" ";
+                cout << info.fitness<< "\n";
+            }            
         }
 
         // create one random solution
@@ -93,19 +104,51 @@ class GeneticAlgorithm{
 
         #pragma region Selection
         void Selection(){
-            vector<vector<int>> ParentSet;
-            
-
+            //Tournament
+            Tournament(2);
             // Elitism
             Elitism(10);
         }
+        
+        // Tournament
+        void Tournament(int size){
+            int repeatNum = population.size()/size;            
+            int c1, c2; // contestant sol index
+            Individual winner;
+            int indexList[population.size()];
+
+            for(int i=0;i<population.size();i++) indexList[i] = i;
+
+            // randomly listup individuals
+            for(int i=0;i<repeatNum;i++){
+                c1 = rand() % population.size();
+                c2 = rand() % population.size();
+                swap(indexList[c1], indexList[c2]);
+            }
+            //repeat tournament
+            for(int i=0;i<repeatNum;i++){
+                    //cout <<indexList[2*i] <<"  vs  "<<indexList[2*i+1]<<endl;
+                //compete (small fitness is winner)
+                if(population[indexList[i]].fitness < population[indexList[i+1]].fitness) // i is winner
+                    ParentSet.push_back(population[indexList[i]]);
+                else // i+1 is winner
+                    ParentSet.push_back(population[indexList[i+1]]); 
+            }
+            cout << "------- Parent set--------\n";
+            PrintIndividualSet(ParentSet);
+        }
+        
+        // Roulette wheel Selection 
+
+
         // Elitism
         void Elitism(int percent){
             int eliteNum = population.size()*percent/100;
-            vector<vector<int>> elite;
-            priority_queue<SolutionInfo, vector<SolutionInfo>, cmp> eliteInfo;
+            vector<Individual> eliteSet;
+            Individual elite;
+            priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> eliteInfo;
             int eliteIndex;
-            SolutionInfo info;
+            IndividualInfo info;
             
             cout << "----- new generation(elite only): "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")--------\n";
             
@@ -113,25 +156,25 @@ class GeneticAlgorithm{
                 // save elite solution to elite vector
                 eliteIndex = populationInfo.top().index;
                     // save elite soluation 
-                elite.push_back(population[eliteIndex]); 
+                elite.array = population[eliteIndex].array;
+                elite.fitness = populationInfo.top().fitness;
+                eliteSet.push_back(elite);
                     // save elite soluation info
-                info.index = elite.size()-1;
-                info.fitness = populationInfo.top().fitness;
+                info.index = eliteSet.size()-1;
+                info.fitness = elite.fitness;                
                 eliteInfo.push(info);
                 // delete elite solution from current population 
                 population.erase(population.begin() + eliteIndex);
                 populationInfo.pop();
-                cout <<"elite(index,fitness): "<<info.index<<","<<info.fitness<<"\n";
+                //cout <<"elite(index,fitness): "<<info.index<<","<<info.fitness<<"\n";
             }
-
             // change current generation population and elite population
             population.clear();
-            elite.swap(population); // swap delete previous vector. 
+            eliteSet.swap(population); // swap delete previous vector. 
             swap(populationInfo, eliteInfo);
 
-            //PrintSolutionInfo(population, populationInfo);
+            PrintIndividualSetWithInfo(population, populationInfo);
         }
-        // Roulette wheel Selection 
 
         #pragma endregion
 
