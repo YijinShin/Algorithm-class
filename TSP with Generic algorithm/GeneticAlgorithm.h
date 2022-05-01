@@ -159,8 +159,8 @@ class GeneticAlgorithm{
             int eliteIndex;
             IndividualInfo info;
             
-            cout << "-----New generation(after Elite): "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")--------\n";
-            
+            //cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
+
             for(int i=0;i<eliteNum;i++){
                 // save elite solution to elite vector
                 eliteIndex = populationInfo.top().index;
@@ -183,6 +183,7 @@ class GeneticAlgorithm{
             swap(populationInfo, eliteInfo);
 
             //PrintIndividualSetWithInfo(population, populationInfo);
+            cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
             PrintIndividualSet(population);
         }
 
@@ -196,9 +197,9 @@ class GeneticAlgorithm{
             }
             // clear parenet set
             parentSet.clear();
-            //cout<<"-----------New generation(after Reproduction)-----------\n";
+            cout<<"-----------New generation(after Reproduction)-----------\n";
             //PrintIndividualSetWithInfo(population, populationInfo);
-            //PrintIndividualSet(population);
+            PrintIndividualSet(population);
         }
 
         void Crossover(vector<int> a, vector<int> b) {
@@ -316,7 +317,7 @@ class GeneticAlgorithm{
             CreateInitialPopulation();
             
             for(int i=0;i<4;i++){
-                cout << endl<<"["<<i<<"]"<<endl;
+                cout << endl<<"Iteration["<<i<<"]"<<endl;
                 //selection
                 Selection();
                 //reproduction
