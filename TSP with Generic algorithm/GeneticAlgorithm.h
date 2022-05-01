@@ -286,13 +286,16 @@ class GeneticAlgorithm{
             vector<int> a_mutation = a;
 
             //Reverse Sequence Mutation(RSM)
-            int start = rand() % deliveryLocationNum;
-            int end = rand() % deliveryLocationNum;
-            
             //start,end 구간 랜덤 설정
+            /*
             while (start == end) {
                 int start = rand() % deliveryLocationNum;
                 int end = rand() % deliveryLocationNum;
+            }*/
+            int start = rand() % deliveryLocationNum;
+            int end = rand() % deliveryLocationNum;
+            while(start == end){
+                end = rand() % deliveryLocationNum;
             }
             if (start > end) swap(start, end);
             //cout << "strat: " << start << "end: " << end << "\n";
