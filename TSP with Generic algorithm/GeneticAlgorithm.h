@@ -30,7 +30,7 @@ class GeneticAlgorithm{
         vector<Individual> parentSet;
         vector<Individual> population; 
         priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> populationInfo;
-        double** adjMatrix;
+        double** adjMatrix;        
 
         #pragma region etc
         double CalcFitness(vector<int> solutionArray){
@@ -119,7 +119,7 @@ class GeneticAlgorithm{
             // Elitism
             Elitism(10);
         }
-        
+
         // Tournament
         void Tournament(int size){
             int repeatNum = population.size()/size;            
@@ -144,7 +144,7 @@ class GeneticAlgorithm{
                 else // i+1 is winner
                     parentSet.push_back(population[indexList[2*i+1]]); 
             }
-            cout << "------- Parent set--------\n";
+            cout << "------- Parent set("<<parentSet.size()<<")--------\n";
             PrintIndividualSet(parentSet);
         }
         
@@ -159,8 +159,6 @@ class GeneticAlgorithm{
             int eliteIndex;
             IndividualInfo info;
             
-            //cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
-
             for(int i=0;i<eliteNum;i++){
                 // save elite solution to elite vector
                 eliteIndex = populationInfo.top().index;
@@ -173,20 +171,16 @@ class GeneticAlgorithm{
                 info.fitness = elite.fitness;                
                 eliteInfo.push(info);
                 // delete elite solution from current population 
-                population.erase(population.begin() + eliteIndex);
                 populationInfo.pop();
-                //cout <<"elite(index,fitness): "<<info.index<<","<<info.fitness<<"\n";
             }
-            // change current generation population and elite population
             population.clear();
+            // change current generation population and elite population
             eliteSet.swap(population); // swap delete previous vector. 
             swap(populationInfo, eliteInfo);
 
-            //PrintIndividualSetWithInfo(population, populationInfo);
             cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
             PrintIndividualSet(population);
         }
-
         #pragma endregion
 
         #pragma region Reproduction
@@ -197,11 +191,10 @@ class GeneticAlgorithm{
             }
             // clear parenet set
             parentSet.clear();
-            cout<<"-----------New generation(after Reproduction)-----------\n";
+            cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
             //PrintIndividualSetWithInfo(population, populationInfo);
             PrintIndividualSet(population);
         }
-
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
             vector<int> b_child = b;
@@ -287,11 +280,6 @@ class GeneticAlgorithm{
 
             //Reverse Sequence Mutation(RSM)
             //start,end 구간 랜덤 설정
-            /*
-            while (start == end) {
-                int start = rand() % deliveryLocationNum;
-                int end = rand() % deliveryLocationNum;
-            }*/
             int start = rand() % deliveryLocationNum;
             int end = rand() % deliveryLocationNum;
             while(start == end){
@@ -325,7 +313,6 @@ class GeneticAlgorithm{
                 Selection();
                 //reproduction
                 Reproduction();
-                PrintIndividualSet(population);
             }
             cout<<"\n\n-----------Result sol -------------\n";
             PrintIndividualSetWithInfo(population, populationInfo);
