@@ -203,59 +203,51 @@ class GeneticAlgorithm{
 
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
-            //cout <<&a_child[0]<<","<<&a[0]<<"\n";
-            //a_child = a;
-            //cout <<&a_child[0]<<","<<&a[0]<<"\n";
             vector<int> b_child = b;
-            queue<int> a_range;//swap 전 해당 구간의 a 원소
-            queue<int> b_range;//swap 전 해당 구간의 b 원소
-            vector<int> a_exist; //b에 이미 존재했던 a_range의 원소의 index
-            vector<int> b_exist; //a에 이미 존재했던 b_range의 원소의 index
+            queue<int> a_swapRange;//swap 전 해당 구간의 a 원소
+            queue<int> b_swapRange;//swap 전 해당 구간의 b 원소
+            priority_queue<int> a_needChange; //a에 이미 존재했던 b_range의 원소의 index
+            priority_queue<int> b_needChange; //b에 이미 존재했던 a_range의 원소의 index
             int mutationProbability = 5;
             int mutationRandomnum;
 
             int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
             int end = 6;
-            //cout << "strat: " << start << "end: " << end << "\n";
 
-            cout << "a_array: ";
+            cout << "a_parent: ";   
             voidPrintArray(a);
-            cout << "b_array: ";
+            cout << "b_parent: ";
             voidPrintArray(b);
             
-//----------------------------------------------segmentation fault 발생 구역 
-            //해당 구간에 대한 swaping
-            for (int i = start; i < end; i++) {
-                a_range.push(a_child[i]);
-                b_range.push(b_child[i]);
+            //----------------------------------------------segmentation fault 발생 구역 
+            //swaping
+            for (int i = start; i <= end; i++) {
+                a_swapRange.push(a_child[i]);
+                b_swapRange.push(b_child[i]);
                 swap(a_child[i], b_child[i]);
             }
-            while (a_range.size() != 0 || b_range.size() != 0) {
-                int a_front = a_range.front();
-                int b_front = b_range.front();
-                a_range.pop();
-                b_range.pop();
+            //check if array has overlapping elememts
+            for(int i=0;i<start-end+1;i++) { // repeate rangeNum
+                int a_swapElement = a_swapRange.front();
+                int b_swapElement = b_swapRange.front();
+                a_swapRange.pop();
+                b_swapRange.pop();
 
-                for (int i = 0; i < deliveryLocationNum; i++) {
-                    if (i >= start && i < end) continue; //교환한 구간의 원소는 건너뛰기
-                    if (a_front == b_child[i]) {
-                        a_exist.push_back(i);
+                for (int j = 0; j < deliveryLocationNum; j++) {
+                    if (j >= start && j < end) continue; //교환한 구간의 원소는 건너뛰기
+                    if (a_swapElement == b_child[j]) {
+                        b_needChange.push(j);
                     }
-                    if (b_front == a_child[i]) {
-                        b_exist.push_back(i);
+                    if (b_swapElement == a_child[j]) {
+                        a_needChange.push(j);
                     }
                 }
             }
-            // 기존의 ordering을 유지하기 위해 sort
-            sort(a_exist.begin(), a_exist.end());
-            sort(b_exist.begin(), b_exist.end());
-
-            for (int i = 0; i < a_exist.size(); i++) {
-                swap(b[a_exist[i]], a_child[b_exist[i]]);
-                //a_child[b_exist[i]] = b[a_exist[i]];
-                //b_child[a_exist[i]] = a[b_exist[i]];
+            //change overleapping elements
+            while(!b_needChange.empty()){
+                swap(a_child[a_needChange.top()], b_child[b_needChange.top()]);
             }
-//----------------------------------------------
+            //----------------------------------------------
             cout << "a_child_array: ";
             voidPrintArray(a_child);
             cout << "b_child_array: ";
@@ -307,14 +299,6 @@ class GeneticAlgorithm{
                 start++;
                 end--;
             }
-
-            /*
-            cout << "a'_array: ";
-            for (int i = 0; i < a.size(); i++) {
-                cout << a_mutation[i] << " ";
-            }
-            cout << "\n";
-            */
             return a_mutation;
         }
 
