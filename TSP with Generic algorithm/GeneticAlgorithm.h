@@ -191,12 +191,12 @@ class GeneticAlgorithm{
         #pragma region Reproduction
         void Reproduction(){
             for(int i=0;i < parentSet.size()/2;i++){
-                cout <<"(crossover: "<<i<<"): "<<2*i<<","<<2*i+1<<endl;
+                //cout <<"(crossover: "<<i<<"): "<<2*i<<","<<2*i+1<<endl;
                 Crossover(parentSet[2*i].array, parentSet[2*i+1].array);
             }
             // clear parenet set
             parentSet.clear();
-            cout<<"-----------New generation(after Reproduction)-----------\n";
+            //cout<<"-----------New generation(after Reproduction)-----------\n";
             //PrintIndividualSetWithInfo(population, populationInfo);
             //PrintIndividualSet(population);
         }
@@ -214,12 +214,13 @@ class GeneticAlgorithm{
             int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
             int end = 6;
 
+            /*
             cout << "a_parent: ";   
             voidPrintArray(a);
             cout << "b_parent: ";
             voidPrintArray(b);
+            */
             
-            //----------------------------------------------segmentation fault 발생 구역 
             //swaping
             for (int i = start; i <= end; i++) {
                 a_swapRange.push(a_child[i]);
@@ -247,12 +248,13 @@ class GeneticAlgorithm{
             while(!b_needChange.empty()){
                 swap(a_child[a_needChange.top()], b_child[b_needChange.top()]);
             }
-            //----------------------------------------------
+            
+            /*
             cout << "a_child_array: ";
             voidPrintArray(a_child);
             cout << "b_child_array: ";
             voidPrintArray(b_child);
-            
+            */
 
             //Probabilistic Mutations 
             mutationRandomnum = rand()%100;
@@ -321,7 +323,7 @@ class GeneticAlgorithm{
                 Reproduction();
                 PrintIndividualSet(population);
             }
-            cout<<"-----------Result sol -------------\n";
+            cout<<"\n\n-----------Result sol -------------\n";
             PrintIndividualSetWithInfo(population, populationInfo);
         }
 
