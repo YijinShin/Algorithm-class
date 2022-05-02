@@ -9,12 +9,12 @@ vector<int>make_population(int size, vector<int> stand_arr);
 
 int main()
 {
-    int init_num = 30; //»ı¼ºÇÏ·Á´Â ·£´ı ¹è¿­ °³¼ö
-    int size = 10; //µµ½Ã °³¼ö
+    int init_num = 30; //ìƒì„±í•˜ë ¤ëŠ” ëœë¤ ë°°ì—´ ê°œìˆ˜
+    int size = 10; //ë„ì‹œ ê°œìˆ˜
     vector<int> stand_arr;
     vector<vector<int>> init_arr;
     srand(time(NULL));
-    // 1~size ±îÁöÀÇ ¼ö°¡ Æ÷ÇÔµÈ ¹è¿­ »ı¼º
+    // 1~size ê¹Œì§€ì˜ ìˆ˜ê°€ í¬í•¨ëœ ë°°ì—´ ìƒì„±
     for (int i = 1; i <= size; i++) {
         stand_arr.push_back(i);
     }
