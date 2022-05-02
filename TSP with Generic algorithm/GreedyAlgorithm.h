@@ -10,7 +10,8 @@ using namespace std;
 
 class GreedyAlgorithm{
     private:
-        int cnt;
+        int locCnt;
+        double** adjMatrix;        
         //cheack all node visitied
         bool CheckAllVisited(bool *visitied, int deliveryLocationNum){
             for(int i=0;i<deliveryLocationNum;i++){
@@ -18,13 +19,23 @@ class GreedyAlgorithm{
             }
             return true;
         }
+        double CalcFitness(int *solution){
+            double fitness=0;
+            for(int i=0;i<locCnt-1;i++){
+                fitness += adjMatrix[solution[i]][solution[i+1]];
+            }
+            fitness += adjMatrix[solution[0]][solution[locCnt-1]];
+            return fitness;
+        }
 
        
     public:
         //  matrix 받아서 greedy 알고리즘 실행 
-        void Greedy(double **adjMatrix, int startPoint, int deliveryLocationNum){
-            cnt = deliveryLocationNum;
+        void Greedy(double **matrix, int startPoint, int deliveryLocationNum){
             bool visited[deliveryLocationNum];
+            locCnt = deliveryLocationNum;
+            adjMatrix = matrix;
+
             for(int i=0;i<deliveryLocationNum;i++) visited[i] = false;
             
             int currentPoint = startPoint;
@@ -32,12 +43,12 @@ class GreedyAlgorithm{
             
             int solution[deliveryLocationNum];
             int solutionIndex = 0;
+            
+            double fitness = 0;
 
             while(1){
                 visited[currentPoint] = true;
-                    //cout << "Visited["<< currentPoint<<"]"<<endl;
                 solution[solutionIndex] = currentPoint;
-                    //cout << "solution["<< solutionIndex<<"]: "<<currentPoint<<endl;
                 if(CheckAllVisited(visited, deliveryLocationNum))break;
                 
                 minWeight = currentPoint;
@@ -50,16 +61,10 @@ class GreedyAlgorithm{
                 }
                 currentPoint = minWeight;
             }
-            double fitness = 0;
-            for(int i=0;i<deliveryLocationNum-1;i++){
-                fitness += adjMatrix[solution[i]][solution[i+1]];
-            }
-            fitness += adjMatrix[solution[0]][solution[deliveryLocationNum-1]];
-            
-            
+            fitness = CalcFitness(solution);
             cout << "[Greedy soluetion] : ";    
             for(int i=0;i<deliveryLocationNum;i++) cout<< solution[i]<<", ";
-            cout << endl <<endl;
+            cout << endl;
             cout <<"fitness:"<<fitness<<endl;
         }
 };      
