@@ -13,18 +13,18 @@ vector<vector<int>> population;
 
 int main()
 {
-    int init_num = 30; //»ı¼ºÇÏ·Á´Â ·£´ı ¹è¿­ °³¼ö
-    int size = 8; //µµ½Ã °³¼ö
+    int init_num = 30; //ìƒì„±í•˜ë ¤ëŠ” ëœë¤ ë°°ì—´ ê°œìˆ˜
+    int size = 8; //ë„ì‹œ ê°œìˆ˜
     vector<int> stand_arr;
     vector<vector<int>> init_arr;
     srand(time(NULL));
 
-    // 1~size ±îÁöÀÇ ¼ö°¡ Æ÷ÇÔµÈ ¹è¿­ »ı¼º
+    // 1~size ê¹Œì§€ì˜ ìˆ˜ê°€ í¬í•¨ëœ ë°°ì—´ ìƒì„±
     for (int i = 1; i <= size; i++) {
         stand_arr.push_back(i);
     }
 
-    //¿¹Á¦ ½ÃµµÇØº»°Í--------------------------------
+    //ì˜ˆì œ ì‹œë„í•´ë³¸ê²ƒ--------------------------------
     vector<int> ex1 = { 3,4,8,2,7,1,6,5 };
     vector<int> ex2 = { 4,2,5,1,6,8,3,7 };
 
@@ -39,18 +39,18 @@ int main()
 void crossover(vector<int> a, vector<int> b, int size) {
     vector<int> a_child = a;
     vector<int> b_child = b;
-    queue<int> a_range;//swap Àü ÇØ´ç ±¸°£ÀÇ a ¿ø¼Ò
-    queue<int> b_range;//swap Àü ÇØ´ç ±¸°£ÀÇ b ¿ø¼Ò
-    vector<int> a_exist; //b¿¡ ÀÌ¹Ì Á¸ÀçÇß´ø a_rangeÀÇ ¿ø¼ÒÀÇ index
-    vector<int> b_exist; //a¿¡ ÀÌ¹Ì Á¸ÀçÇß´ø b_rangeÀÇ ¿ø¼ÒÀÇ index
+    queue<int> a_range;//swap ì „ í•´ë‹¹ êµ¬ê°„ì˜ a ì›ì†Œ
+    queue<int> b_range;//swap ì „ í•´ë‹¹ êµ¬ê°„ì˜ b ì›ì†Œ
+    vector<int> a_exist; //bì— ì´ë¯¸ ì¡´ì¬í–ˆë˜ a_rangeì˜ ì›ì†Œì˜ index
+    vector<int> b_exist; //aì— ì´ë¯¸ ì¡´ì¬í–ˆë˜ b_rangeì˜ ì›ì†Œì˜ index
 
-    int start = 3; // ³í¹® ¿¹½ÃÃ³·³ ÇÏ´Â °Å¶ó ÀÌÇØÇÏ±â ÆíÇÏ½Ç °Å¿¡¿ä
+    int start = 3; // ë…¼ë¬¸ ì˜ˆì‹œì²˜ëŸ¼ í•˜ëŠ” ê±°ë¼ ì´í•´í•˜ê¸° í¸í•˜ì‹¤ ê±°ì—ìš”
     int end = 6;
     //int start = rand() % size;
     //int end = rand() % size;
 
-    //start,end ±¸°£ ·£´ı ¼³Á¤
-    // end-start = size-1ÀÌ¸é »ç½Ç»ó ºÎ¸ğ²¨ ÀüÃ¼°¡ ÇÏ³ª¾¿ »ı±â±â ¶§¹®
+    //start,end êµ¬ê°„ ëœë¤ ì„¤ì •
+    // end-start = size-1ì´ë©´ ì‚¬ì‹¤ìƒ ë¶€ëª¨êº¼ ì „ì²´ê°€ í•˜ë‚˜ì”© ìƒê¸°ê¸° ë•Œë¬¸
     //while (start == end || abs(end-start) == size-1) {
     //    int start = rand() % size;
     //    int end = rand() % size;
@@ -72,7 +72,7 @@ void crossover(vector<int> a, vector<int> b, int size) {
     cout << "\n";
 
 
-    //ÇØ´ç ±¸°£¿¡ ´ëÇÑ swaping
+    //í•´ë‹¹ êµ¬ê°„ì— ëŒ€í•œ swaping
     for (int i = start; i < end; i++) {
         a_range.push(a_child[i]);
         b_range.push(b_child[i]);
@@ -86,7 +86,7 @@ void crossover(vector<int> a, vector<int> b, int size) {
         b_range.pop();
 
         for (int i = 0; i < size; i++) {
-            if (i >= start && i < end) continue; //±³È¯ÇÑ ±¸°£ÀÇ ¿ø¼Ò´Â °Ç³Ê¶Ù±â
+            if (i >= start && i < end) continue; //êµí™˜í•œ êµ¬ê°„ì˜ ì›ì†ŒëŠ” ê±´ë„ˆë›°ê¸°
             if (a_front == b_child[i]) {
                 a_exist.push_back(i);
             }
@@ -95,7 +95,7 @@ void crossover(vector<int> a, vector<int> b, int size) {
             }
         }
     }
-    // ±âÁ¸ÀÇ orderingÀ» À¯ÁöÇÏ±â À§ÇØ sort
+    // ê¸°ì¡´ì˜ orderingì„ ìœ ì§€í•˜ê¸° ìœ„í•´ sort
     sort(a_exist.begin(), a_exist.end());
     sort(b_exist.begin(), b_exist.end());
 
@@ -126,7 +126,7 @@ void mutation(vector<int> a, int size) {
     int start = rand() % size;
     int end = rand() % size;
     
-    //start,end ±¸°£ ·£´ı ¼³Á¤
+    //start,end êµ¬ê°„ ëœë¤ ì„¤ì •
     while (start == end) {
         int start = rand() % size;
         int end = rand() % size;
