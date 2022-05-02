@@ -10,6 +10,7 @@ using namespace std;
 
 class GreedyAlgorithm{
     private:
+        int cnt;
         //cheack all node visitied
         bool CheckAllVisited(bool *visitied, int deliveryLocationNum){
             for(int i=0;i<deliveryLocationNum;i++){
@@ -17,9 +18,12 @@ class GreedyAlgorithm{
             }
             return true;
         }
+
+       
     public:
         //  matrix 받아서 greedy 알고리즘 실행 
         void Greedy(double **adjMatrix, int startPoint, int deliveryLocationNum){
+            cnt = deliveryLocationNum;
             bool visited[deliveryLocationNum];
             for(int i=0;i<deliveryLocationNum;i++) visited[i] = false;
             
@@ -46,9 +50,16 @@ class GreedyAlgorithm{
                 }
                 currentPoint = minWeight;
             }
-
+            double fitness = 0;
+            for(int i=0;i<deliveryLocationNum-1;i++){
+                fitness += adjMatrix[solution[i]][solution[i+1]];
+            }
+            fitness += adjMatrix[solution[0]][solution[deliveryLocationNum-1]];
+            
+            
             cout << "[Greedy soluetion] : ";    
             for(int i=0;i<deliveryLocationNum;i++) cout<< solution[i]<<", ";
             cout << endl <<endl;
+            cout <<"fitness:"<<fitness<<endl;
         }
 };      

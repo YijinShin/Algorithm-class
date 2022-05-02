@@ -25,7 +25,7 @@ struct cmp{
 
 class GeneticAlgorithm{
     private:
-        int deliveryLocationNum = 0;
+        int deliveryLocationNum;
         int startPoint;
         vector<Individual> parentSet;
         vector<Individual> population; 
@@ -71,7 +71,7 @@ class GeneticAlgorithm{
 
         #pragma region Initialization
         void CreateInitialPopulation() {
-            int initPopulationSize = 30;
+            int initPopulationSize = 500000;
             srand(time(NULL));
 
             //setting standard array
@@ -144,8 +144,8 @@ class GeneticAlgorithm{
                 else // i+1 is winner
                     parentSet.push_back(population[indexList[2*i+1]]); 
             }
-            cout << "------- Parent set("<<parentSet.size()<<")--------\n";
-            PrintIndividualSet(parentSet);
+            //cout << "------- Parent set("<<parentSet.size()<<")--------\n";
+            //PrintIndividualSet(parentSet);
         }
         
         // Roulette wheel Selection 
@@ -178,8 +178,8 @@ class GeneticAlgorithm{
             eliteSet.swap(population); // swap delete previous vector. 
             swap(populationInfo, eliteInfo);
 
-            cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
-            PrintIndividualSet(population);
+            //cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
+            //PrintIndividualSet(population);
         }
         #pragma endregion
 
@@ -191,9 +191,9 @@ class GeneticAlgorithm{
             }
             // clear parenet set
             parentSet.clear();
-            cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
+            //cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
             //PrintIndividualSetWithInfo(population, populationInfo);
-            PrintIndividualSet(population);
+            //PrintIndividualSet(population);
         }
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
@@ -202,7 +202,7 @@ class GeneticAlgorithm{
             queue<int> b_swapRange;//swap 전 해당 구간의 b 원소
             priority_queue<int> a_needChange; //a에 이미 존재했던 b_range의 원소의 index
             priority_queue<int> b_needChange; //b에 이미 존재했던 a_range의 원소의 index
-            int mutationProbability = 5;
+            int mutationProbability = 30;
             int mutationRandomnum;
 
             int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
@@ -222,27 +222,35 @@ class GeneticAlgorithm{
                 swap(a_child[i], b_child[i]);
             }
             //check if array has overlapping elememts
-            for(int i=0;i<start-end+1;i++) { // repeate rangeNum
+            for(int i=0 ; i<=end-start ; i++){ // repeate rangeNum
                 int a_swapElement = a_swapRange.front();
                 int b_swapElement = b_swapRange.front();
-                a_swapRange.pop();
                 b_swapRange.pop();
+                a_swapRange.pop();
 
                 for (int j = 0; j < deliveryLocationNum; j++) {
-                    if (j >= start && j < end) continue; //교환한 구간의 원소는 건너뛰기
+                    if (j >= start && j <= end) continue; //교환한 구간의 원소는 건너뛰기
+                    //cout << "comp: "<<a_swapElement<<","<<b_child[j]<<endl;
                     if (a_swapElement == b_child[j]) {
+                        //cout << "*\n";
                         b_needChange.push(j);
                     }
+                    //cout << "comp: "<<b_swapElement<<","<<a_child[j]<<endl;
                     if (b_swapElement == a_child[j]) {
+                       //cout << "*\n";
                         a_needChange.push(j);
                     }
                 }
             }
             //change overleapping elements
-            while(!b_needChange.empty()){
+            //cout <<"겹침 size:"<<b_needChange.size()<<endl;
+            //cout <<"겹침 size:"<<a_needChange.size()<<endl;
+            int changeCnt = b_needChange.size();
+            for(int i=0;i<changeCnt;i++){
                 swap(a_child[a_needChange.top()], b_child[b_needChange.top()]);
+                a_needChange.pop();
+                b_needChange.pop();
             }
-            
             /*
             cout << "a_child_array: ";
             voidPrintArray(a_child);
@@ -307,7 +315,7 @@ class GeneticAlgorithm{
             //create initial population
             CreateInitialPopulation();
             
-            for(int i=0;i<4;i++){
+            for(int i=0;i<20;i++){
                 cout << endl<<"Iteration["<<i<<"]"<<endl;
                 //selection
                 Selection();
