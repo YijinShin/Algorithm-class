@@ -13,18 +13,18 @@ vector<vector<int>> population;
 
 int main()
 {
-    int init_num = 30; //�����Ϸ��� ���� �迭 ����
-    int size = 8; //���� ����
+    int init_num = 30; //생성하려는 랜덤 배열 개수
+    int size = 8; //도시 개수
     vector<int> stand_arr;
     vector<vector<int>> init_arr;
     srand(time(NULL));
 
-    // 1~size ������ ���� ���Ե� �迭 ����
+    // 1~size 까지의 수가 포함된 배열 생성
     for (int i = 1; i <= size; i++) {
         stand_arr.push_back(i);
     }
 
-    //���� �õ��غ���--------------------------------
+    //예제 시도해본것--------------------------------
     vector<int> ex1 = { 3,4,8,2,7,1,6,5 };
     vector<int> ex2 = { 4,2,5,1,6,8,3,7 };
 
