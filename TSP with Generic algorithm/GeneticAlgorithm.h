@@ -27,6 +27,7 @@ class GeneticAlgorithm{
     private:
         int deliveryLocationNum;
         int startPoint;
+        int initPopulationSize;
         vector<Individual> parentSet;
         vector<Individual> population; 
         priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> populationInfo;
@@ -71,7 +72,6 @@ class GeneticAlgorithm{
 
         #pragma region Initialization
         void CreateInitialPopulation() {
-            int initPopulationSize = 500000;
             srand(time(NULL));
 
             //setting standard array
@@ -137,7 +137,6 @@ class GeneticAlgorithm{
             }
             //repeat tournament
             for(int i=0;i<repeatNum;i++){
-                    //cout <<indexList[2*i] <<"  vs  "<<indexList[2*i+1]<<endl;
                 //compete (small fitness is winner)
                 if(population[indexList[2*i]].fitness < population[indexList[2*i+1]].fitness) // i is winner
                     parentSet.push_back(population[indexList[2*i]]);
@@ -186,13 +185,11 @@ class GeneticAlgorithm{
         #pragma region Reproduction
         void Reproduction(){
             for(int i=0;i < parentSet.size()/2;i++){
-                //cout <<"(crossover: "<<i<<"): "<<2*i<<","<<2*i+1<<endl;
                 Crossover(parentSet[2*i].array, parentSet[2*i+1].array);
             }
             // clear parenet set
             parentSet.clear();
             //cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
-            //PrintIndividualSetWithInfo(population, populationInfo);
             //PrintIndividualSet(population);
         }
         void Crossover(vector<int> a, vector<int> b) {
@@ -229,22 +226,16 @@ class GeneticAlgorithm{
                 a_swapRange.pop();
 
                 for (int j = 0; j < deliveryLocationNum; j++) {
-                    if (j >= start && j <= end) continue; //교환한 구간의 원소는 건너뛰기
-                    //cout << "comp: "<<a_swapElement<<","<<b_child[j]<<endl;
+                    if (j >= start && j <= end) continue;
                     if (a_swapElement == b_child[j]) {
-                        //cout << "*\n";
                         b_needChange.push(j);
                     }
-                    //cout << "comp: "<<b_swapElement<<","<<a_child[j]<<endl;
                     if (b_swapElement == a_child[j]) {
-                       //cout << "*\n";
                         a_needChange.push(j);
                     }
                 }
             }
             //change overleapping elements
-            //cout <<"겹침 size:"<<b_needChange.size()<<endl;
-            //cout <<"겹침 size:"<<a_needChange.size()<<endl;
             int changeCnt = b_needChange.size();
             for(int i=0;i<changeCnt;i++){
                 swap(a_child[a_needChange.top()], b_child[b_needChange.top()]);
@@ -287,14 +278,12 @@ class GeneticAlgorithm{
             vector<int> a_mutation = a;
 
             //Reverse Sequence Mutation(RSM)
-            //start,end 구간 랜덤 설정
             int start = rand() % deliveryLocationNum;
             int end = rand() % deliveryLocationNum;
             while(start == end){
                 end = rand() % deliveryLocationNum;
             }
             if (start > end) swap(start, end);
-            //cout << "strat: " << start << "end: " << end << "\n";
 
             while (start < end) {
                 swap(a_mutation[start], a_mutation[end]);
@@ -308,14 +297,15 @@ class GeneticAlgorithm{
 
     public:
         // generic main function
-        void Genetic(int locNum, double **matrix, int start){
+        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int iterationCnt){
             deliveryLocationNum = locNum;
             adjMatrix = matrix;
             startPoint = start;
+            initPopulationSize = iniPopulationCnt;
             //create initial population
             CreateInitialPopulation();
             
-            for(int i=0;i<20;i++){
+            for(int i=0;i<iterationCnt;i++){
                 cout << endl<<"Iteration["<<i<<"]"<<endl;
                 //selection
                 Selection();
