@@ -34,6 +34,7 @@ class GeneticAlgorithm{
         double** adjMatrix;   
         int iter = 0;     
         int elitismPercent;
+        int mutationProbability;
 
         #pragma region etc
         double CalcFitness(vector<int> solutionArray){
@@ -201,7 +202,6 @@ class GeneticAlgorithm{
             queue<int> b_swapRange;//swap 전 해당 구간의 b 원소
             priority_queue<int> a_needChange; //a에 이미 존재했던 b_range의 원소의 index
             priority_queue<int> b_needChange; //b에 이미 존재했던 a_range의 원소의 index
-            int mutationProbability = 30;
             int mutationRandomnum;
 
             int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
@@ -299,9 +299,10 @@ class GeneticAlgorithm{
 
     public:
         // generic main function
-        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int elitism){
+        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int elitism, int mutation){
             deliveryLocationNum = locNum;
             adjMatrix = matrix;
+            mutationProbability = mutation;
             startPoint = start;
             initPopulationSize = iniPopulationCnt;
             elitismPercent = elitism;
@@ -309,7 +310,7 @@ class GeneticAlgorithm{
             CreateInitialPopulation();
             
             //for(int i=0;i<iterationCnt;i++){
-            while(population.size()>10){
+            while(population.size()>5){
                 iter++;
                 cout << endl<<"Iteration["<<iter<<"]"<<endl;
                 //selection
@@ -319,6 +320,17 @@ class GeneticAlgorithm{
             }
             cout<<"\n\n-----------Result sol -------------\n";
             PrintIndividualSetWithInfo(population, populationInfo);
+        }
+
+        double CalcFitness_1(vector<int> solutionArray){
+            double fitness = 0.0;
+
+            for(int i=0;i<deliveryLocationNum-1;i++){
+                fitness += adjMatrix[solutionArray[i]][solutionArray[i+1]];
+            }
+            fitness += adjMatrix[solutionArray[0]][solutionArray[deliveryLocationNum-1]];
+            
+            return fitness;  
         }
 
 };
