@@ -31,7 +31,8 @@ class GeneticAlgorithm{
         vector<Individual> parentSet;
         vector<Individual> population; 
         priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> populationInfo;
-        double** adjMatrix;        
+        double** adjMatrix;   
+        int iter = 0;     
 
         #pragma region etc
         double CalcFitness(vector<int> solutionArray){
@@ -297,7 +298,7 @@ class GeneticAlgorithm{
 
     public:
         // generic main function
-        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int iterationCnt){
+        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt){
             deliveryLocationNum = locNum;
             adjMatrix = matrix;
             startPoint = start;
@@ -305,8 +306,10 @@ class GeneticAlgorithm{
             //create initial population
             CreateInitialPopulation();
             
-            for(int i=0;i<iterationCnt;i++){
-                cout << endl<<"Iteration["<<i<<"]"<<endl;
+            //for(int i=0;i<iterationCnt;i++){
+            while(population.size()>2){
+                iter++;
+                cout << endl<<"Iteration["<<iter<<"]"<<endl;
                 //selection
                 Selection();
                 //reproduction

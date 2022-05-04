@@ -15,22 +15,23 @@ int main(int argc, char** argv){ // execute: ./a.out filename.csv
     GreedyAlgorithm greedy;
     GeneticAlgorithm genetic;
 
-    cout << "File name: ";
-    cin >> fileName;
+    //cout << "File name: ";
+    //cin >> fileName;
+    
     //get data and do pre-processing
-    deliveryLocationNum = preprocessing.ReadData(fileName); 
+        //deliveryLocationNum = preprocessing.ReadData(fileName); 
+    deliveryLocationNum = preprocessing.ReadData("Atlanta.csv"); 
     double **adjMatrix = preprocessing.ConstructAdjMatrix();
-    //preprocessing.ShowAdjMatrix(adjMatrix);
 
     //Greedy
     greedy.Greedy(adjMatrix, 0, deliveryLocationNum);
 
     //Generic
+    
     cout << "initial PopulationSize: ";
     cin >> initPopulationSize;
-    cout << "Iteration: ";
-    cin >> iterationCnt;
-    genetic.Genetic(deliveryLocationNum,adjMatrix,0, initPopulationSize,iterationCnt);
+    
+    genetic.Genetic(deliveryLocationNum,adjMatrix,0, initPopulationSize);
 
     return 0;
 }
