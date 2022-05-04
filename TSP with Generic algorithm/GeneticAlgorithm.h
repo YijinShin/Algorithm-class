@@ -33,6 +33,7 @@ class GeneticAlgorithm{
         priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> populationInfo;
         double** adjMatrix;   
         int iter = 0;     
+        int elitismPercent;
 
         #pragma region etc
         double CalcFitness(vector<int> solutionArray){
@@ -118,7 +119,7 @@ class GeneticAlgorithm{
             //Tournament
             Tournament(2);
             // Elitism
-            Elitism(10);
+            Elitism();
         }
 
         // Tournament
@@ -151,8 +152,8 @@ class GeneticAlgorithm{
         // Roulette wheel Selection 
 
         // Elitism
-        void Elitism(int percent){
-            int eliteNum = population.size()*percent/100;
+        void Elitism(){
+            int eliteNum = population.size()*elitismPercent/100;
             vector<Individual> eliteSet;
             Individual elite;
             priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> eliteInfo;
@@ -298,16 +299,17 @@ class GeneticAlgorithm{
 
     public:
         // generic main function
-        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt){
+        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int elitism){
             deliveryLocationNum = locNum;
             adjMatrix = matrix;
             startPoint = start;
             initPopulationSize = iniPopulationCnt;
+            elitismPercent = elitism;
             //create initial population
             CreateInitialPopulation();
             
             //for(int i=0;i<iterationCnt;i++){
-            while(population.size()>2){
+            while(population.size()>10){
                 iter++;
                 cout << endl<<"Iteration["<<iter<<"]"<<endl;
                 //selection

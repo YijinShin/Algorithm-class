@@ -8,8 +8,9 @@ using namespace std;
 
 int main(int argc, char** argv){ // execute: ./a.out filename.csv
     int deliveryLocationNum = 0;
-    int initPopulationSize;
+    int initPopulationSize = 20000;
     int iterationCnt;
+    int elitism = 30;
     string fileName;
     Preprocessing preprocessing;
     GreedyAlgorithm greedy;
@@ -27,11 +28,13 @@ int main(int argc, char** argv){ // execute: ./a.out filename.csv
     greedy.Greedy(adjMatrix, 0, deliveryLocationNum);
 
     //Generic
-    
+    /*
     cout << "initial PopulationSize: ";
     cin >> initPopulationSize;
-    
-    genetic.Genetic(deliveryLocationNum,adjMatrix,0, initPopulationSize);
+    cout << "Elitism percent: ";
+    cin >> elitism;
+    */
+    genetic.Genetic(deliveryLocationNum,adjMatrix,0, initPopulationSize, elitism);
 
     return 0;
 }
