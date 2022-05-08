@@ -191,8 +191,8 @@ class GeneticAlgorithm{
             }
             // clear parenet set
             parentSet.clear();
-            //cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
-            //PrintIndividualSet(population);
+            cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
+            PrintIndividualSet(population);
         }
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
@@ -309,10 +309,10 @@ class GeneticAlgorithm{
             CreateInitialPopulation();
             
             //for(int i=0;i<iterationCnt;i++){
-            while(population.size()>5){
+            while(population.size()>4){
                 iter++;
                 cout << endl<<"Iteration["<<iter<<"]"<<endl;
-                //selection
+                //selection  
                 Selection();
                 //reproduction
                 Reproduction();
@@ -320,16 +320,4 @@ class GeneticAlgorithm{
             cout<<"\n\n-----------Result sol -------------\n";
             PrintIndividualSetWithInfo(population, populationInfo);
         }
-
-        double CalcFitness_1(vector<int> solutionArray){
-            double fitness = 0.0;
-
-            for(int i=0;i<deliveryLocationNum-1;i++){
-                fitness += adjMatrix[solutionArray[i]][solutionArray[i+1]];
-            }
-            fitness += adjMatrix[solutionArray[0]][solutionArray[deliveryLocationNum-1]];
-            
-            return fitness;  
-        }
-
 };

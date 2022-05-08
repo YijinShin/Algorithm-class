@@ -203,9 +203,6 @@ class GeneticAlgorithm{
             priority_queue<int> b_needChange; //b에 이미 존재했던 a_range의 원소의 index
             int mutationRandomnum;
 
-            // int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
-            // int end = 6;
-
             int start = rand() % deliveryLocationNum;
             int end = rand() % deliveryLocationNum;
 
@@ -216,13 +213,6 @@ class GeneticAlgorithm{
                 end = rand() % deliveryLocationNum;
             }
             if (start > end) swap(start, end); 
-
-            /*
-            cout << "a_parent: ";   
-            voidPrintArray(a);
-            cout << "b_parent: ";
-            voidPrintArray(b);
-            */
             
             //swaping
             for (int i = start; i <= end; i++) {
@@ -346,17 +336,6 @@ class GeneticAlgorithm{
             }
             cout<<"\n\n-----------Result sol -------------\n";
             PrintIndividualSetWithInfo(population, populationInfo);
-        }
-
-        double CalcFitness_1(vector<int> solutionArray){
-            double fitness = 0.0;
-
-            for(int i=0;i<deliveryLocationNum-1;i++){
-                fitness += adjMatrix[solutionArray[i]][solutionArray[i+1]];
-            }
-            fitness += adjMatrix[solutionArray[0]][solutionArray[deliveryLocationNum-1]];
-            
-            return fitness;  
         }
 
 };
