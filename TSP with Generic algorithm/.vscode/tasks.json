@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++ 활성 파일 빌드",
-            "command": "/usr/bin/g++",
+            "command": "/usr/bin/g++ -std=c++11",
             "args": [
                 "-fdiagnostics-color=always",
                 "-g",
@@ -17,12 +17,9 @@
             "problemMatcher": [
                 "$gcc"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "detail": "디버거에서 생성된 작업입니다."
-        }
+        },
     ],
     "version": "2.0.0"
 }
