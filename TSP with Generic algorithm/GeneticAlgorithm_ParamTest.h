@@ -5,7 +5,14 @@
 #include <string>
 #include <queue>
 #include <time.h>
+#include <fstream>
+#include <sstream>
 using namespace std;
+
+/* This file contains tools for conducting parameter tests and authorization convergence tests.
+    output
+    - Iteration_Info_List.csv 
+*/
 
 struct IndividualInfo{
     int index;
@@ -23,6 +30,13 @@ struct cmp{
     }
 };
 
+// 각 iteration 의 정보를 저장함 (for test)
+struct IterInfo{
+    int iterNum;
+    double minimumValue;
+    int populationSize;
+};
+
 class GeneticAlgorithm{
     private:
         int deliveryLocationNum;
@@ -35,6 +49,8 @@ class GeneticAlgorithm{
         int iter = 0;     
         int elitismPercent;
         int mutationProbability;
+        // for test
+        vector<IterInfo> iterInfoList;
 
         #pragma region etc
         double CalcFitness(vector<int> solutionArray){
@@ -83,7 +99,6 @@ class GeneticAlgorithm{
             IndividualInfo info;
             
             for(int i=0;i<deliveryLocationNum;i++) individual.array.push_back(i);
-            //cout << "-------- Initial population --------\n";
             for (int i = 0; i < initPopulationSize; i++) {
                 // get solution, push individual into population
                 individual.array = CreateRandomSolution(individual.array);
@@ -95,11 +110,6 @@ class GeneticAlgorithm{
                 info.fitness = fitness;
                 info.index = population.size()-1;
                 populationInfo.push(info);
-                
-                //cout << info.index<< ": ";
-                //for(int j=0;j<individual.array.size();j++) cout << individual.array[j]<<" ";
-                //cout << info.fitness<< "\n";
-                
             }            
         }
 
@@ -179,8 +189,6 @@ class GeneticAlgorithm{
             eliteSet.swap(population); // swap delete previous vector. 
             swap(populationInfo, eliteInfo);
 
-            //cout << "----Elite: "<< population.size()<<"/"<<percent<<"%("<<eliteNum <<")----\n";
-            //PrintIndividualSet(population);
         }
         #pragma endregion
 
@@ -191,8 +199,6 @@ class GeneticAlgorithm{
             }
             // clear parenet set
             parentSet.clear();
-            //cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
-            //PrintIndividualSet(population);
         }
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
@@ -311,6 +317,35 @@ class GeneticAlgorithm{
 
         #pragma endregion
 
+        #pragma region Iteration convergence test tools
+        void SaveIterInfo(int num, int size, int value){
+            IterInfo info;
+            info.iterNum = num;
+            info.populationSize = size;
+            info.minimumValue = value;
+            iterInfoList.push_back(info);
+        }
+
+        void Save_csv(vector<IterInfo> iterInfoList){
+            string f_name = "Iteration_Info_List.csv";
+            ofstream outfile(f_name);
+
+            int listSize = iterInfoList.size();
+            int id;
+            IterInfo item;
+            
+            outfile << "iterNum,populationSize,minimumValue\n";
+            
+            for(int i=0; i<listSize; i++){
+                item = iterInfoList[i];
+                
+                outfile << item.iterNum << ","<< item.populationSize << ","<< to_string(item.minimumValue) << "\n";
+                
+            }
+            outfile.close();
+        }
+        #pragma endregion
+
     public:
         // generic main function
         void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int elitism, int mutation){
@@ -326,16 +361,17 @@ class GeneticAlgorithm{
             //for(int i=0;i<iterationCnt;i++){
             while(population.size()>20){
                 iter++;
-                cout << endl<<"Iteration["<<iter<<"]" << "mutation_rate: "<< mutationProbability << "\n";
+                cout << endl<<"Iteration["<<iter<<"]" << "mutation_rate: "<< mutationProbability << "min value: "<< populationInfo.top().fitness<<"\n";
                 //selection
                 Selection();
                 //reproduction
                 Reproduction();
+                //save iteration information
+                SaveIterInfo(iter, population.size(), populationInfo.top().fitness);
                 //Reduce mutationProbability
                 if(iter%3==0) mutationProbability = mutationProbability*0.95;
             }
-            cout<<"\n\n-----------Result sol -------------\n";
-            PrintIndividualSetWithInfo(population, populationInfo);
+            Save_csv(iterInfoList);
 
         }
 
