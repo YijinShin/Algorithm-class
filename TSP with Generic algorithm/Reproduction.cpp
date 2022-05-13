@@ -74,8 +74,8 @@ void crossover(vector<int> a, vector<int> b, int size) {
 
     //해당 구간에 대한 swaping
     for (int i = start; i < end; i++) {
-        a_range.push(a_child[i]);
-        b_range.push(b_child[i]);
+        a_range.push(a_child[i]); 
+        b_range.push(b_child[i]); 
         swap(a_child[i], b_child[i]);
     }
 
