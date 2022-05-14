@@ -1,6 +1,7 @@
 #pragma once 
 #include <iostream>
 #include <cmath>
+#include <random>
 #include <vector>
 #include <string>
 #include <queue>
@@ -33,6 +34,14 @@ struct cmp{
     bool operator()(IndividualInfo a, IndividualInfo b){
         return a.fitness > b.fitness;
     }
+};
+
+struct Rank{
+    float index;
+    float rank;
+    double fitness;
+    float SP; // select probability
+    float sliceSize;
 };
 
 // 각 iteration 의 정보를 저장함 (for test)
@@ -134,6 +143,7 @@ class GeneticAlgorithm{
         void Selection(){
             //Tournament
             Tournament(2);
+            //RankRoultteWheel();
             // Elitism
             Elitism();
         }
@@ -162,8 +172,68 @@ class GeneticAlgorithm{
                     parentSet.push_back(population[indexList[2*i+1]]); 
             }
         }
+
+        // Rank based roultte wheel 
+        void RankRoultteWheel(){
+            float RankSum = 0;
+            priority_queue<IndividualInfo, vector<IndividualInfo>, cmp> copyPopulationInfo;
+            Rank currentIndividual;
+            vector<Rank> SPList;
+            int rank = 0;
+
+            // Modify as needed
+            int MIN = 0;
+            int MAX = 100;
+            double f;
+            double roultteSelector;
+            
+            //get sum of rank
+            for(float i=1;i<=population.size();i++) RankSum = RankSum + i;
+            //copy populationInfo 
+            copyPopulationInfo = populationInfo;
+            // calc SP of each individuals
+            while(!copyPopulationInfo.empty()){
+                //currentIndividual = new Rank;
+                rank ++;
+                currentIndividual.index = copyPopulationInfo.top().index;
+                currentIndividual.fitness = copyPopulationInfo.top().fitness; // fitness based priority queue라서 필요함. 
+                currentIndividual.rank = rank;
+                currentIndividual.SP = (rank * (100/RankSum));
+                SPList.push_back(currentIndividual);
+                if(rank == 1)currentIndividual.sliceSize = currentIndividual.SP;
+                else if(rank> 1) currentIndividual.sliceSize = SPList[rank-1].sliceSize + currentIndividual.SP;
+                copyPopulationInfo.pop();
+            }
+            /*
+            for(int i=0;i<SPList.size();i++){
+                cout << SPList[i].index << "    " << SPList[i].rank << "    " << SPList[i].SP << "......"<<SPList[i].sliceSize << "\n";
+            }
+            */
+            int index = 0;
+            bool selectSuccess = false;
+            Individual selectedInd;
+            for(int i=0;i<population.size()/2;i++){
+                selectSuccess = false;
+                //while(!selectSuccess){
+                    f = (double)rand() / RAND_MAX;
+                    roultteSelector = MIN + f * (MAX - MIN);
+                    //cout << roultteSelector<<" choose\n";
+                    while(index < SPList.size()){
+                        if(roultteSelector< SPList[index].sliceSize){
+                            cout << "selected: "<<roultteSelector<<" ------- ";
+                            cout << SPList[index].index <<" , "<< SPList[index].rank <<" , "<< SPList[index].SP <<" , "<< SPList[index].sliceSize<<"\n";
+                            selectedInd = population[SPList[index].index];
+                            parentSet.push_back(selectedInd);
+                            SPList.erase(SPList.begin() + index);
+                  //          selectSuccess = true;
+                            break;
+                        }
+                        index++;
+                    }
+                //}
+            }
+        }
         
-        // Roulette wheel Selection 
 
         // Elitism
         void Elitism(){
