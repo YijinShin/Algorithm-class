@@ -14,6 +14,11 @@ using namespace std;
     - Iteration_Info_List.csv 
 */
 
+template<typename T>
+std::ostream& write_typed_data(std::ostream& stream, const T& value) {
+    return stream.write(reinterpret_cast<const char*>(&value), sizeof(T));
+}
+
 struct IndividualInfo{
     int index;
     double fitness;
@@ -147,6 +152,7 @@ class GeneticAlgorithm{
                 c2 = rand() % population.size();
                 swap(indexList[c1], indexList[c2]);
             }
+
             //repeat tournament
             for(int i=0;i<repeatNum;i++){
                 //compete (small fitness is winner)
@@ -155,8 +161,6 @@ class GeneticAlgorithm{
                 else // i+1 is winner
                     parentSet.push_back(population[indexList[2*i+1]]); 
             }
-            //cout << "------- Parent set("<<parentSet.size()<<")--------\n";
-            //PrintIndividualSet(parentSet);
         }
         
         // Roulette wheel Selection 
@@ -318,7 +322,7 @@ class GeneticAlgorithm{
         #pragma endregion
 
         #pragma region Iteration convergence test tools
-        void SaveIterInfo(int num, int size, int value){
+        void SaveIterInfo(int num, int size, double value){
             IterInfo info;
             info.iterNum = num;
             info.populationSize = size;
@@ -338,9 +342,7 @@ class GeneticAlgorithm{
             
             for(int i=0; i<listSize; i++){
                 item = iterInfoList[i];
-                
-                outfile << item.iterNum << ","<< item.populationSize << ","<< to_string(item.minimumValue) << "\n";
-                
+                outfile << item.iterNum << ","<< item.populationSize << ","<< item.minimumValue << "\n";
             }
             outfile.close();
         }
