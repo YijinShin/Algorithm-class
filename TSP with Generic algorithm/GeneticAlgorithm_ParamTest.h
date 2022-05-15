@@ -51,6 +51,11 @@ struct IterInfo{
     int populationSize;
 };
 
+struct Result{
+    int iteration;
+    float converValue;
+};
+
 class GeneticAlgorithm{
     private:
         int deliveryLocationNum;
@@ -186,6 +191,8 @@ class GeneticAlgorithm{
             int MAX = 100;
             double f;
             double roultteSelector;
+            float Amax = 1.2; //normal
+            float Amin = 2-Amax; //normal
             
             //get sum of rank
             for(float i=1;i<=population.size();i++) RankSum = RankSum + i;
@@ -198,7 +205,8 @@ class GeneticAlgorithm{
                 currentIndividual.index = copyPopulationInfo.top().index;
                 currentIndividual.fitness = copyPopulationInfo.top().fitness; // fitness based priority queue라서 필요함. 
                 currentIndividual.rank = rank;
-                currentIndividual.SP = (rank * (100/RankSum));
+                //currentIndividual.SP = (rank * (100/RankSum));
+                currentIndividual.SP = (Amax - (Amax-Amin)*(rank-1)/(RankSum-1))*1/RankSum;
                 SPList.push_back(currentIndividual);
                 if(rank == 1)currentIndividual.sliceSize = currentIndividual.SP;
                 else if(rank> 1) currentIndividual.sliceSize = SPList[rank-1].sliceSize + currentIndividual.SP;
@@ -212,7 +220,7 @@ class GeneticAlgorithm{
             int index = 0;
             bool selectSuccess = false;
             Individual selectedInd;
-            for(int i=0;i<population.size()/2;i++){
+            for(int i=0;i<population.size()* 3/4;i++){
                 selectSuccess = false;
                 //while(!selectSuccess){
                     f = (double)rand() / RAND_MAX;
@@ -220,8 +228,8 @@ class GeneticAlgorithm{
                     //cout << roultteSelector<<" choose\n";
                     while(index < SPList.size()){
                         if(roultteSelector< SPList[index].sliceSize){
-                            cout << "selected: "<<roultteSelector<<" ------- ";
-                            cout << SPList[index].index <<" , "<< SPList[index].rank <<" , "<< SPList[index].SP <<" , "<< SPList[index].sliceSize<<"\n";
+                            //cout << "selected: "<<roultteSelector<<" ------- ";
+                            //cout << SPList[index].index <<" , "<< SPList[index].rank <<" , "<< SPList[index].SP <<" , "<< SPList[index].sliceSize<<"\n";
                             selectedInd = population[SPList[index].index];
                             parentSet.push_back(selectedInd);
                             SPList.erase(SPList.begin() + index);
@@ -420,7 +428,8 @@ class GeneticAlgorithm{
 
     public:
         // generic main function
-        void Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int elitism, int mutation){
+        Result Genetic(int locNum, double **matrix, int start, int iniPopulationCnt, int elitism, int mutation){
+            Result result;
             deliveryLocationNum = locNum;
             adjMatrix = matrix;
             mutationProbability = mutation;
@@ -430,21 +439,40 @@ class GeneticAlgorithm{
             //create initial population
             CreateInitialPopulation();
             
+            int stopCnt = 0;
+            float PreviousMinValue;
             //for(int i=0;i<iterationCnt;i++){
             while(population.size()>20){
+            //while(stopCnt < 20 || population.size()>20){
                 iter++;
                 cout << endl<<"Iteration["<<iter<<"]" << "mutation_rate: "<< mutationProbability << "min value: "<< populationInfo.top().fitness<<"\n";
+                 // path print
+                for(int i=0;i<locNum;i++){
+                    cout << population[populationInfo.top().index].array[i]<<", ";
+                }
+                cout << "\n";
+                
                 //selection
                 Selection();
                 //reproduction
                 Reproduction();
+                /*
+                if(iter!= 0){
+                    if(PreviousMinValue == populationInfo.top().fitness) stopCnt++;
+                    else stopCnt = 0;
+                }
+                PreviousMinValue = populationInfo.top().fitness;
+                */
                 //save iteration information
                 SaveIterInfo(iter, population.size(), populationInfo.top().fitness);
                 //Reduce mutationProbability
                 if(iter%3==0) mutationProbability = mutationProbability*0.95;
             }
+            result.converValue = populationInfo.top().fitness;
+            result.iteration =  iter;
             Save_csv(iterInfoList);
-
+            
+            return result;
         }
 
 };
