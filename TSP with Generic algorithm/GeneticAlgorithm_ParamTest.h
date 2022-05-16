@@ -54,6 +54,7 @@ struct IterInfo{
 struct Result{
     int iteration;
     float converValue;
+    vector<int> array;
 };
 
 class GeneticAlgorithm{
@@ -442,16 +443,17 @@ class GeneticAlgorithm{
             int stopCnt = 0;
             float PreviousMinValue;
             //for(int i=0;i<iterationCnt;i++){
-            while(population.size()>20){
+            while(population.size()>5){
             //while(stopCnt < 20 || population.size()>20){
                 iter++;
                 cout << endl<<"Iteration["<<iter<<"]" << "mutation_rate: "<< mutationProbability << "min value: "<< populationInfo.top().fitness<<"\n";
                  // path print
+                 /*
                 for(int i=0;i<locNum;i++){
                     cout << population[populationInfo.top().index].array[i]<<", ";
                 }
                 cout << "\n";
-                
+                */
                 //selection
                 Selection();
                 //reproduction
@@ -470,6 +472,7 @@ class GeneticAlgorithm{
             }
             result.converValue = populationInfo.top().fitness;
             result.iteration =  iter;
+            result.array = population[populationInfo.top().index].array;
             Save_csv(iterInfoList);
             
             return result;
