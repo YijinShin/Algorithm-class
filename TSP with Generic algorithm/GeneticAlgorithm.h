@@ -23,6 +23,12 @@ struct cmp{
     }
 };
 
+struct Result{
+    int iteration;
+    float converValue;
+    vector<int> array;
+};
+
 class GeneticAlgorithm{
     private:
         int deliveryLocationNum;
@@ -83,7 +89,7 @@ class GeneticAlgorithm{
             IndividualInfo info;
             
             for(int i=0;i<deliveryLocationNum;i++) individual.array.push_back(i);
-            cout << "-------- Initial population --------\n";
+            //cout << "-------- Initial population --------\n";
             for (int i = 0; i < initPopulationSize; i++) {
                 // get solution, push individual into population
                 individual.array = CreateRandomSolution(individual.array);
@@ -96,9 +102,9 @@ class GeneticAlgorithm{
                 info.index = population.size()-1;
                 populationInfo.push(info);
                 
-                cout << info.index<< ": ";
-                for(int j=0;j<individual.array.size();j++) cout << individual.array[j]<<" ";
-                cout << info.fitness<< "\n";
+                //cout << info.index<< ": ";
+                //for(int j=0;j<individual.array.size();j++) cout << individual.array[j]<<" ";
+                //cout << info.fitness<< "\n";
                 
             }            
         }
@@ -191,8 +197,8 @@ class GeneticAlgorithm{
             }
             // clear parenet set
             parentSet.clear();
-            cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
-            PrintIndividualSet(population);
+            //cout<<"-----------New generation(after Reproduction)("<<population.size()<<")-----------\n";
+            //PrintIndividualSet(population);
         }
         void Crossover(vector<int> a, vector<int> b) {
             vector<int> a_child = a;
@@ -203,15 +209,16 @@ class GeneticAlgorithm{
             priority_queue<int> b_needChange; //b에 이미 존재했던 a_range의 원소의 index
             int mutationRandomnum;
 
-            int start = 3; // 논문 예시처럼 하는 거라 이해하기 편하실 거에요
-            int end = 6;
+            int start = rand() % deliveryLocationNum;
+            int end = rand() % deliveryLocationNum;
 
-            /*
-            cout << "a_parent: ";   
-            voidPrintArray(a);
-            cout << "b_parent: ";
-            voidPrintArray(b);
-            */
+            //start,end 구간 랜덤 설정
+            //end-start = size이면 사실상 부모꺼 전체가 하나씩 생기기 때문
+            while (start == end || abs(end-start) == deliveryLocationNum-1) {
+                start = rand() % deliveryLocationNum;
+                end = rand() % deliveryLocationNum;
+            }
+            if (start > end) swap(start, end); 
             
             //swaping
             for (int i = start; i <= end; i++) {
@@ -243,19 +250,8 @@ class GeneticAlgorithm{
                 a_needChange.pop();
                 b_needChange.pop();
             }
-            /*
-            cout << "a_child_array: ";
-            voidPrintArray(a_child);
-            cout << "b_child_array: ";
-            voidPrintArray(b_child);
-            */
 
-            //Probabilistic Mutations 
-            mutationRandomnum = rand()%100;
-            if(mutationRandomnum < mutationProbability) a_child = Mutation(a_child);
-            mutationRandomnum = rand()%100;
-            if(mutationRandomnum < mutationProbability) b_child = Mutation(b_child);
-            
+            //Crossover로 만든 children 먼저 추가하기
             // save new child to population(next generation)
             Individual c1, c2;
             IndividualInfo c1Info, c2Info;
@@ -273,6 +269,31 @@ class GeneticAlgorithm{
             c2Info.index = population.size()-1;
             c2Info.fitness = c1.fitness;
             populationInfo.push(c2Info);
+
+            //(Crossover + Mutation)로 만든 children 추가하기 (mutation 발생시에만 추가)
+            //Probabilistic Mutations 
+            mutationRandomnum = rand()%100;
+            if(mutationRandomnum < mutationProbability){
+                a_child = Mutation(a_child);
+                //child a
+                c1.array = a_child;
+                c1.fitness = CalcFitness(a_child);
+                population.push_back(c1);
+                c1Info.index = population.size()-1;
+                c1Info.fitness = c1.fitness;
+                populationInfo.push(c1Info);
+            }
+            mutationRandomnum = rand()%100;
+            if(mutationRandomnum < mutationProbability){
+                b_child = Mutation(b_child);
+                //child b
+                c2.array = b_child;
+                c2.fitness = CalcFitness(b_child);
+                population.push_back(c2);
+                c2Info.index = population.size()-1;
+                c2Info.fitness = c1.fitness;
+                populationInfo.push(c2Info);
+            }
         }
 
         vector<int> Mutation(vector<int> a){
@@ -309,15 +330,19 @@ class GeneticAlgorithm{
             CreateInitialPopulation();
             
             //for(int i=0;i<iterationCnt;i++){
-            while(population.size()>4){
+            while(population.size()>20){
                 iter++;
-                cout << endl<<"Iteration["<<iter<<"]"<<endl;
-                //selection  
+                cout << endl<<"Iteration["<<iter<<"]" << "mutation_rate: "<< mutationProbability << "\n";
+                //selection
                 Selection();
                 //reproduction
                 Reproduction();
+                //Reduce mutationProbability
+                if(iter%3==0) mutationProbability = mutationProbability*0.95;
             }
             cout<<"\n\n-----------Result sol -------------\n";
             PrintIndividualSetWithInfo(population, populationInfo);
+
         }
+
 };
