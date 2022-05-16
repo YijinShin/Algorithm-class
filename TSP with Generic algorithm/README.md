@@ -46,7 +46,7 @@ This program uses genetic algorithms to solve  Traveling Salesman Problem(TSP).
  * IterationGraph.ipynb
  Draw Graph of Minimum value per iteration with Iteration_Info_List.csv data.
  * AL_project2_visualize_plot.ipynb  
-
+ A visualization task of the resulting graph for the graph of initial conditions or the calculated path is implemented.
  * Iteration_Info_List.csv   
  Save data of all iteration and the minimum distence of each iteration. 
  * Result_List.csv
