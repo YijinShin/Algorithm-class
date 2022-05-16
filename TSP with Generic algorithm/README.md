@@ -28,6 +28,7 @@ This program uses genetic algorithms to solve  Traveling Salesman Problem(TSP).
  
 
 ## Example of execution
+<img width="361" alt="스크린샷 2022-05-17 오전 2 39 32" src="https://user-images.githubusercontent.com/49178058/168653737-9284f924-d2ed-4ff8-a52d-6a20f9c1530c.png">
 
 
 
