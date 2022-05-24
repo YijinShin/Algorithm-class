@@ -1,5 +1,5 @@
 # Algorithm-class
-2022-1학기 알고리즘 수업
+2022-1학기 알고리즘 수업 Team project
 
 Team project
 -------------
